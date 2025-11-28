@@ -1,5 +1,8 @@
 #include <stdint.h>
 
+#ifndef SYSTEM_RAM_H
+#define SYSTEM_RAM_H
+
 #define RAM_SIZE 4096
 
 
@@ -19,3 +22,5 @@ void RAM_clear(RAM* ram);
 
 /*get value from the RAM*/
 uint8_t RAM_get_value(RAM* ram, uint16_t address);
+
+#endif
