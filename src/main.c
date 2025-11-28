@@ -1,6 +1,6 @@
-void go ();
+//void go ();
 
 int main(){
-    go();
+    //go();
     return 0;
 }
