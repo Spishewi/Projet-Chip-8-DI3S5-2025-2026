@@ -15,7 +15,7 @@ RAM* RAM_init();
 void RAM_Destroy(RAM* ram);
 
 /*set a value in the RAM*/
-void inline RAM_set_value(RAM* ram, uint16_t address, uint8_t value);
+void RAM_set_value(RAM* ram, uint16_t address, uint8_t value);
 
 /*set all the RAM to 0*/
 void RAM_clear(RAM* ram);
