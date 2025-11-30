@@ -26,7 +26,7 @@ void RAM_clear(RAM* ram);
 /*get value from the RAM*/
 uint8_t RAM_get_value(RAM* ram, uint16_t address);
 
-/*get an instruction in the RAM (an instruction is 16 bits instead of 8 bits for a value)*/
+/*get an instruction from the RAM (an instruction is 16 bits instead of 8 bits for a value)*/
 uint16_t RAM_get_instruction(RAM* ram, uint16_t address);
 
 #endif
