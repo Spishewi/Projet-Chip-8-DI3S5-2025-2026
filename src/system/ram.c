@@ -7,16 +7,14 @@
 /*allocate the RAM array*/
 RAM* RAM_init(){
     /*allocate the RAM array*/
-    RAM* ram = malloc(sizeof(RAM));
+    /*uses calloc to allocate the memory and set it to 0*/
+    RAM* ram = calloc(1, sizeof(RAM));
 
     /*if the allocation havn't worked, return NULL*/
     if(!ram){
         fprintf(stderr, "[ERROR] : RAM cannot be allocated.");
         exit(1);
     }
-
-    /*set all the RAM to 0*/
-    RAM_clear(ram);
 
     return ram;
 }
@@ -65,4 +63,13 @@ uint8_t RAM_get_value(RAM* ram, uint16_t address){
         exit(1);
     }
     return (*ram)[address];
+}
+
+/*get an instruction in the RAM (an instruction is 16 bits instead of 8 bits for a value)*/
+uint16_t RAM_get_instruction(RAM* ram, uint16_t address){
+    uint8_t first_value = RAM_get_value(ram, address);
+    uint8_t second_value = RAM_get_value(ram, address + 1);
+    
+    // concatenate the two bytes into one instruction
+    return (first_value << 8) | second_value;
 }
