@@ -6,27 +6,29 @@
 #define RAM_SIZE 4096
 
 
-typedef uint8_t RAM[RAM_SIZE];
+struct RAM {
+    uint8_t ram_array[RAM_SIZE]
+};
 
 /*allocate the RAM array*/
-RAM* RAM_init();
+struct RAM* RAM_init();
 
 /*free the RAM array*/
-void RAM_Destroy(RAM* ram);
-
-/*set a value in the RAM*/
-void RAM_set_value(RAM* ram, uint16_t address, uint8_t value);
-
-/*set an instruction in the RAM (an instruction is 16 bits instead of 8 bits for a value)*/
-void RAM_set_instruction(RAM* ram, uint16_t address, uint16_t instruction);
+void RAM_Destroy(struct RAM* ram);
 
 /*set all the RAM to 0*/
-void RAM_clear(RAM* ram);
+void RAM_clear(struct RAM* ram);
+
+/*set a value in the RAM*/
+void RAM_set_value(struct RAM* ram, uint16_t address, uint8_t value);
 
 /*get value from the RAM*/
-uint8_t RAM_get_value(RAM* ram, uint16_t address);
+uint8_t RAM_get_value(struct RAM* ram, uint16_t address);
+
+/*set an instruction in the RAM (an instruction is 16 bits instead of 8 bits for a value)*/
+void RAM_set_instruction(struct RAM* ram, uint16_t address, uint16_t instruction);
 
 /*get an instruction from the RAM (an instruction is 16 bits instead of 8 bits for a value)*/
-uint16_t RAM_get_instruction(RAM* ram, uint16_t address);
+uint16_t RAM_get_instruction(struct RAM* ram, uint16_t address);
 
 #endif

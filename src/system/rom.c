@@ -7,8 +7,8 @@
 #include "system/rom.h"
 
 /*load a rom into ram*/
-int ROM_load_to_ram(const char* restrict file_path, RAM* ram, uint16_t start_address){
-        uint16_t instruction_buffer = 0;
+int ROM_load_to_ram(const char* restrict file_path, struct RAM* ram, uint16_t start_address){
+        uint8_t read_buffer = 0;
         FILE* file_ptr = NULL;
 
         uint16_t current_address = start_address;
@@ -21,11 +21,12 @@ int ROM_load_to_ram(const char* restrict file_path, RAM* ram, uint16_t start_add
         }
 
         /*read the file instruction by instruction*/
-        while(fread(&instruction_buffer, sizeof(instruction_buffer), 1, file_ptr)){
-            //printf("Setting value %04x at address %04x\n", instruction_buffer, current_address);
-            printf("%s\n", instruction_as_str(instruction_buffer));
-            RAM_set_instruction(ram, current_address, instruction_buffer);
-            current_address += sizeof(instruction_buffer);
+        while(fread(&read_buffer, sizeof(read_buffer), 1, file_ptr)){
+            printf("Setting value 0x%02x at address 0x%02x\n", read_buffer, current_address);
+            //printf("%s\n", instruction_as_str(instruction_buffer));
+            //RAM_set_instruction(ram, current_address, instruction_buffer);
+            RAM_set_value(ram, current_address, read_buffer);
+            current_address += sizeof(read_buffer);
         }
 
         /*don't forget to close file*/

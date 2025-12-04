@@ -5,6 +5,6 @@
 #define SYSTEM_ROM_H
 
 /*load a rom into ram*/
-int ROM_load_to_ram(const char* restrict file_path, RAM* ram, uint16_t start_address);
+int ROM_load_to_ram(const char* restrict file_path, struct RAM* ram, uint16_t start_address);
 
 #endif
