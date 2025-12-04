@@ -7,7 +7,7 @@
 
 
 struct RAM {
-    uint8_t ram_array[RAM_SIZE]
+    uint8_t ram_array[RAM_SIZE];
 };
 
 /*allocate the RAM array*/
@@ -30,5 +30,8 @@ void RAM_set_instruction(struct RAM* ram, uint16_t address, uint16_t instruction
 
 /*get an instruction from the RAM (an instruction is 16 bits instead of 8 bits for a value)*/
 uint16_t RAM_get_instruction(struct RAM* ram, uint16_t address);
+
+/*print `n` instructions starting from `start_address`*/
+void RAM_print_instructions(struct RAM* ram, uint16_t start_address, uint16_t n);
 
 #endif

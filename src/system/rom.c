@@ -22,10 +22,9 @@ int ROM_load_to_ram(const char* restrict file_path, struct RAM* ram, uint16_t st
 
         /*read the file instruction by instruction*/
         while(fread(&read_buffer, sizeof(read_buffer), 1, file_ptr)){
-            printf("Setting value 0x%02x at address 0x%02x\n", read_buffer, current_address);
-            //printf("%s\n", instruction_as_str(instruction_buffer));
-            //RAM_set_instruction(ram, current_address, instruction_buffer);
+            /*set the value in the ram*/
             RAM_set_value(ram, current_address, read_buffer);
+            /*increment the address*/
             current_address += sizeof(read_buffer);
         }
 
