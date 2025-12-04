@@ -10,10 +10,10 @@ struct RAM {
     uint8_t ram_array[RAM_SIZE];
 };
 
-/*allocate the RAM array*/
+/*allocate the RAM*/
 struct RAM* RAM_init();
 
-/*free the RAM array*/
+/*free the RAM*/
 void RAM_Destroy(struct RAM* ram);
 
 /*set all the RAM to 0*/
