@@ -7,9 +7,11 @@
 #ifndef SYSTEM_CPU_H
 #define SYSTEM_CPU_H
 
+#define CPU_VX_NUMBER 16
+
 struct CPU {
     /*registers*/
-    uint8_t Vx[16];
+    uint8_t Vx[CPU_VX_NUMBER];
     uint16_t I;
     uint8_t PC;
 
