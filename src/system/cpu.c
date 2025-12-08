@@ -17,11 +17,20 @@ struct CPU* CPU_init(struct RAM* ram, struct Display* display){
     }
 
     /*set default values*/
+    /*registers*/
     for(int i=0; i<CPU_VX_NUMBER; i++) cpu->Vx[i] = 0;
     cpu->I = 0;
     cpu->PC = 0;
 
-    /*set pointers*/
+    /*stack*/
+    for(int i=0; i<CPU_STACK_SIZE; i++) cpu->Sx[i] = 0;
+    cpu->SP = 0;
+    
+    /*timers*/
+    cpu->DT = 0;
+    cpu->ST = 0;
+
+    /*pointers*/
     cpu->ram_ptr = ram;
     cpu->display_ptr = display;
 
@@ -35,3 +44,9 @@ void CPU_destroy(struct CPU* cpu){
 
 /*Do a fetch-decode-execute cycle*/
 int CPU_FDE(struct CPU* cpu){}
+
+/*Fetch the next instruction*/
+static uint16_t CPU_Fetch(struct CPU* cpu){
+    uint16_t instruction = RAM_get_instruction(cpu->ram_ptr, cpu->PC);
+    return instruction;
+}

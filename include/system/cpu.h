@@ -8,12 +8,21 @@
 #define SYSTEM_CPU_H
 
 #define CPU_VX_NUMBER 16
+#define CPU_STACK_SIZE 16
 
 struct CPU {
     /*registers*/
-    uint8_t Vx[CPU_VX_NUMBER];
-    uint16_t I;
-    uint8_t PC;
+    uint8_t Vx[CPU_VX_NUMBER]; // general purpose registers
+    uint16_t I; // general purpose address register
+    uint16_t PC; // program counter
+    
+    /*stack*/
+    uint16_t Sx[CPU_STACK_SIZE]; // the stack
+    uint8_t SP; // stack pointer
+
+    /*timers*/
+    uint8_t DT; // delay timer
+    uint8_t ST; // sound timer
 
     /*useful pointers*/
     struct RAM* ram_ptr;
