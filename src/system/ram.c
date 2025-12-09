@@ -63,6 +63,27 @@ void RAM_set_instruction(struct RAM* ram, uint16_t address, uint16_t instruction
     RAM_set_value(ram, address + 1, second_value);
 }
 
+/*set a block of data in the RAM*/
+void RAM_set_block(struct RAM* ram, uint16_t address, uint8_t* block, uint16_t block_size){
+    if (address + block_size >= RAM_SIZE){
+        fprintf(stderr, "[ERROR] : trying to set block outside the RAM.");
+        exit(1);
+    }
+    for(unsigned int i = 0; i < block_size; i++){
+        RAM_set_value(ram, address + i, block[i]);
+    }
+}
+
+/*get a block of data from the RAM. /!\ the block is a pointer to the RAM, so it will be lost if the RAM is freed*/
+const uint8_t* RAM_get_block(struct RAM* ram, uint16_t address, uint16_t block_size){
+    if (address + block_size >= RAM_SIZE){
+        fprintf(stderr, "[ERROR] : trying to get block from outside the RAM.", address);
+        exit(1);
+    }
+
+    return &(ram->ram_array[address]);
+}
+
 /*get an instruction in the RAM (an instruction is 16 bits instead of 8 bits for a value)*/
 uint16_t RAM_get_instruction(struct RAM* ram, uint16_t address){
     uint8_t first_value = RAM_get_value(ram, address);
