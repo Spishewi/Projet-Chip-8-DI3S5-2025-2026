@@ -42,11 +42,6 @@ void CPU_destroy(struct CPU* cpu){
     free(cpu);
 }
 
-/*Do a fetch-decode-execute cycle*/
-int CPU_FDE(struct CPU* cpu){
-    return 0;
-}
-
 /*Fetch the next instruction*/
 static uint16_t CPU_fetch(struct CPU* cpu){
     uint16_t instruction = RAM_get_instruction(cpu->ram_ptr, cpu->PC);
@@ -194,6 +189,18 @@ static int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction
         break;
     default:
         return -1; // error
+    }
+    return 0;
+}
+
+/*Do a fetch-decode-execute cycle*/
+int CPU_FDE(struct CPU* cpu){
+    uint8_t full_instruction = CPU_fetch(cpu);
+    enum CPU_Instruction decoded_instruction = CPU_decode(full_instruction);
+    int error_code = CPU_execute(cpu, decoded_instruction, full_instruction);
+    if(error_code != 0){
+        fprintf(stderr, "[error] : CPU execution error. Error code : %d\n", error_code);
+        exit(1);
     }
     return 0;
 }
