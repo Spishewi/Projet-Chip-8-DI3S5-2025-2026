@@ -77,7 +77,7 @@ void RAM_set_block(struct RAM* ram, uint16_t address, uint8_t* block, uint16_t b
 /*get a block of data from the RAM. /!\ the block is a pointer to the RAM, so it will be lost if the RAM is freed*/
 const uint8_t* RAM_get_block(struct RAM* ram, uint16_t address, uint16_t block_size){
     if (address + block_size >= RAM_SIZE){
-        fprintf(stderr, "[ERROR] : trying to get block from outside the RAM.", address);
+        fprintf(stderr, "[ERROR] : trying to get block from outside the RAM.");
         exit(1);
     }
 

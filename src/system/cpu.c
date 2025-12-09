@@ -43,11 +43,14 @@ void CPU_destroy(struct CPU* cpu){
 }
 
 /*Do a fetch-decode-execute cycle*/
-int CPU_FDE(struct CPU* cpu){}
+int CPU_FDE(struct CPU* cpu){
+    return 0;
+}
 
 /*Fetch the next instruction*/
 static uint16_t CPU_fetch(struct CPU* cpu){
     uint16_t instruction = RAM_get_instruction(cpu->ram_ptr, cpu->PC);
+    cpu->PC += 2;
     return instruction;
 }
 
@@ -123,7 +126,7 @@ static enum CPU_Instruction CPU_decode(uint16_t instruction){
             return UNKNOWN;
         }
     case 0xF000:
-        switch (instruction && 0x00FF)
+        switch (instruction & 0x00FF)
         {
         case 0x0007:
             return LD_VDT;
@@ -152,27 +155,45 @@ static enum CPU_Instruction CPU_decode(uint16_t instruction){
 }
 
 static int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction, uint16_t full_instruction){
+    uint8_t Vx, Vy, n, byte;
+    uint16_t addr;
+
     switch (decoded_instruction)
     {
     case CLS:
         Display_CLS(cpu->display_ptr);
         break;
+
     case LD_VB:
-        cpu->Vx[full_instruction & 0x0F00] = (uint8_t) full_instruction & 0x00FF;
+        Vx = (full_instruction & 0x0F00) >> 8;
+        byte = full_instruction & 0x00FF;
+
+        cpu->Vx[Vx] = byte;
         break;
+
     case LD_IA:
-        cpu->I = full_instruction & 0x0FFF;
+        addr = (full_instruction & 0x0FFF);
+
+        cpu->I = addr;
+        break;
+
     case DRW:
-        const uint8_t* sprite_block = RAM_get_block(cpu->ram_ptr, cpu->I, full_instruction & 0x000F);
+        Vx = (full_instruction & 0x0F00) >> 8;
+        Vy = (full_instruction & 0x00F0) >> 4;
+        n = full_instruction & 0x000F;
+
         struct Sprite sprite;
-        Sprite_init(&sprite, full_instruction & 0x000F);
-        for (unsigned int i = 0; i < full_instruction & 0x000F; i++){
+        Sprite_init(&sprite, n);
+
+        for (unsigned int i = 0; i < n; i++){
             Sprite_add(&sprite, RAM_get_value(cpu->ram_ptr, cpu->I + i));
         }
-        Display_DRW(cpu->display_ptr, &sprite, full_instruction & 0x0F00, full_instruction & 0x00F0, &(cpu->Vx[0xF]));
+
+        Display_DRW(cpu->display_ptr, &sprite, Vx, Vy, &(cpu->Vx[0xF]));
         Sprite_destroy(&sprite);
         break;
     default:
         return -1; // error
     }
+    return 0;
 }
