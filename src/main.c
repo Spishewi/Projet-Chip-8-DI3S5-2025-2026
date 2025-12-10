@@ -9,19 +9,30 @@
 #include "system/cpu.h"
 
 int main(int argc, char** argv){
+    /*handling the arguments*/
+    if(argc != 2){
+        fprintf(stderr, "[Error] : Missing ROM file in the arguments.\n");
+        return 1;
+    }
+
+    /*get the rom file path from the arguments*/
+    char* rom_file_path = argv[1];
+    printf("Running ROM : \"%s\".", rom_file_path);
 
     /*initialize the RAM*/
     struct RAM* ram = RAM_init();
 
     /*load a ROM into the RAM*/
-    //ROM_load_to_ram("./roms/1-chip8-logo.ch8", ram, 0x200);
-    ROM_load_to_ram("./roms/2-ibm-logo.ch8", ram, 0x200);
+    if(ROM_load_to_ram(rom_file_path, ram, 0x200)){
+        fprintf(stderr, "[ERROR] : cannot read ROM at \"%s\".\n", rom_file_path);
+        return 1;
+    }
 
     /*initialize the display*/
     struct Display display;
     if (Display_init(&display, 10))
     {
-        fprintf(stderr, "[Error] : Display initialisation error\n");
+        fprintf(stderr, "[Error] : Display initialisation error.\n");
         return 1;
     }
     printf("Display initialized.\n");

@@ -16,7 +16,6 @@ int ROM_load_to_ram(const char* restrict file_path, struct RAM* ram, uint16_t st
         /*open the rom file in binary mode*/
         file_ptr = fopen(file_path, "rb");
         if(!file_ptr){
-            fprintf(stderr, "[ERROR] : cannot read ROM at \"%s\".", file_path);
             return 1;
         }
 
