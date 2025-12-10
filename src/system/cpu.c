@@ -172,12 +172,25 @@ static int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction
         }
         break;
         
+    case RET: // 00EE
+        cpu->PC = cpu->SP;
+        cpu->SP -= 1;
+        break;
+    
     case JP_A: // 1nnn
         addr = (full_instruction & 0x0FFF);
 
         cpu->PC = addr;
         break;
 
+    case CALL: // 2nnn
+        addr = (full_instruction & 0x0FFF);
+
+        cpu->SP += 1;
+        cpu->SP += cpu->PC;
+        cpu->PC = addr;
+        break;
+        
     case SE_VB: // 3xkk
         x = (full_instruction & 0x0F00) >> 8;
         byte = full_instruction & 0x00FF;
@@ -217,6 +230,13 @@ static int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction
         byte = full_instruction & 0x00FF;
 
         cpu->Vx[x] += byte;
+        break;
+
+    case LD_VV: // 8xy0
+        x = (full_instruction & 0x0F00) >> 8;
+        y = (full_instruction & 0x00F0) >> 4;
+
+        cpu->Vx[x] = cpu->Vx[y];
         break;
 
     case SNE_VV: // 9xy0
