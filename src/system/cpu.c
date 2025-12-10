@@ -44,13 +44,18 @@ void CPU_destroy(struct CPU* cpu){
 
 /*Fetch the next instruction*/
 static uint16_t CPU_fetch(struct CPU* cpu){
+    /*get the current instruction from ram*/
     uint16_t instruction = RAM_get_instruction(cpu->ram_ptr, cpu->PC);
+
+    /*increment the program counter*/
     cpu->PC += 2;
+
     return instruction;
 }
 
 /*Decode an instruction*/
 static enum CPU_Instruction CPU_decode(uint16_t instruction){
+    /*try to match patterns to decode the instruction*/
     switch (instruction & 0xF000)
     {
     case 0x0000:
@@ -149,10 +154,14 @@ static enum CPU_Instruction CPU_decode(uint16_t instruction){
     }
 }
 
+/*extract data from uint16_t instruction and execute it (precondition: ` decoded_instruction` and `full_instruction` must be coherent)*/
 static int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction, uint16_t full_instruction){
+
+    /*define variables that can be used to extract data from an instruction*/
     uint8_t x, y, n, byte;
     uint16_t addr;
 
+    /*execute all instruction based on the decoded instruction*/
     switch (decoded_instruction)
     {
     case CLS: // 00E0
@@ -248,9 +257,17 @@ static int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction
 
 /*Do a fetch-decode-execute cycle*/
 int CPU_FDE(struct CPU* cpu){
+    /*fetch*/
     uint16_t full_instruction = CPU_fetch(cpu);
+
+    /*decode*/
     enum CPU_Instruction decoded_instruction = CPU_decode(full_instruction);
+    if(decoded_instruction == UNKNOWN){
+        fprintf(stderr, "[error] : CPU decoding error : unknown instruction 0x%04x\n", full_instruction);
+        exit(1);
+    }
     
+    /*execute*/
     int error_code = CPU_execute(cpu, decoded_instruction, full_instruction);
     if(error_code != 0){
         fprintf(stderr, "[error] : CPU execution error. Error code : %d, failed instruction : 0x%04x\n", error_code, full_instruction);

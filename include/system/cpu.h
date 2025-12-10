@@ -10,6 +10,7 @@
 #define CPU_VX_NUMBER 16
 #define CPU_STACK_SIZE 16
 
+/*structure representing a CPU. Needs to be initialized with the`CPU_init` function, and destroyed with the `CPU_destroy` function*/
 struct CPU {
     /*registers*/
     uint8_t Vx[CPU_VX_NUMBER]; // general purpose registers
@@ -29,6 +30,7 @@ struct CPU {
     struct Display* display_ptr;
 };
 
+/*enumeration representing all the instructions supported by a chip-8 CPU*/
 enum CPU_Instruction {
     SYS, // 0nnn
     CLS, // 00E0
