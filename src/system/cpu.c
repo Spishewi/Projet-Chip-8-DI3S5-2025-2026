@@ -187,6 +187,12 @@ static int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction
         Display_DRW(cpu->display_ptr, &sprite, Vx, Vy, &(cpu->Vx[0xF]));
         Sprite_destroy(&sprite);
         break;
+    
+    case JP_A: //à tester
+        addr = (full_instruction & 0x0FFF);
+        
+        cpu->PC = addr;
+        break;
     default:
         return -1; // error
     }
