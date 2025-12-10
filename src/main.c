@@ -20,10 +20,14 @@ int main(int argc, char** argv){
     printf("Running ROM : \"%s\".", rom_file_path);
 
     /*initialize the RAM*/
-    struct RAM* ram = RAM_init();
+    struct RAM ram;
+    if(RAM_init(&ram)){
+        fprintf(stderr, "[ERROR] : RAM initialization error.\n");
+        return 1;
+    }
 
     /*load a ROM into the RAM*/
-    if(ROM_load_to_ram(rom_file_path, ram, 0x200)){
+    if(ROM_load_to_ram(rom_file_path, &ram, 0x200)){
         fprintf(stderr, "[ERROR] : cannot read ROM at \"%s\".\n", rom_file_path);
         return 1;
     }
@@ -46,8 +50,13 @@ int main(int argc, char** argv){
     printf("Display color set.\n"); 
 
     /*initialize the CPU*/
-    struct CPU* cpu = CPU_init(ram, &display);
-    cpu->PC = 0x200;
+    struct CPU cpu;
+    if(CPU_init(&cpu, &ram, &display)){
+        fprintf(stderr, "[ERROR] : RAM initialization error.\n");
+        return 1;
+    }
+
+    cpu.PC = 0x200;
 
     /*main loop (run the fetch-decode-execute cycle)*/
     bool running = true;
@@ -65,10 +74,10 @@ int main(int argc, char** argv){
         }
 
         /*debug*/
-        RAM_print_instructions(ram, cpu->PC, 1);
+        RAM_print_instructions(&ram, cpu.PC, 1);
 
         /*run one FDE cycle*/
-        CPU_FDE(cpu);
+        CPU_FDE(&cpu);
 
         /*update the screen*/
         Display_update(&display);
@@ -79,8 +88,8 @@ int main(int argc, char** argv){
     
     /*free all the memory*/
     Display_destroy(&display);
-    CPU_destroy(cpu);
-    RAM_Destroy(ram);
+    CPU_destroy(&cpu);
+    RAM_Destroy(&ram);
 
     return 0;
 }

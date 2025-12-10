@@ -6,18 +6,17 @@
 #include <system/ram.h>
 
 /*allocate the RAM array*/
-struct RAM* RAM_init(){
+int RAM_init(struct RAM* ram){
     /*allocate the RAM array*/
     /*uses calloc to allocate the memory and set it to 0*/
-    struct RAM* ram = calloc(1, sizeof(struct RAM));
+    ram->ram_array = calloc(RAM_SIZE, sizeof(uint8_t));
 
     /*if the allocation havn't worked, return NULL*/
-    if(!ram){
-        fprintf(stderr, "[ERROR] : RAM cannot be allocated.");
-        exit(1);
+    if(!ram->ram_array){
+        return 1;
     }
 
-    return ram;
+    return 0;
 }
 
 /*free the RAM array*/
