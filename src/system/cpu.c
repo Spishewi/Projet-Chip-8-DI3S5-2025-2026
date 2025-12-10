@@ -10,7 +10,7 @@ int CPU_init(struct CPU* cpu, struct RAM* ram, struct Display* display){
     /*registers*/
     for(int i=0; i<CPU_VX_NUMBER; i++) cpu->Vx[i] = 0;
     cpu->I = 0;
-    cpu->PC = 0;
+    cpu->PC = 0x200;
 
     /*stack*/
     for(int i=0; i<CPU_STACK_SIZE; i++) cpu->Sx[i] = 0;

@@ -52,8 +52,6 @@ int main(int argc, char** argv){
         return 1;
     }
 
-    cpu.PC = 0x200;
-
     /*main loop (run the fetch-decode-execute cycle)*/
     bool running = true;
     while (running)
