@@ -171,12 +171,25 @@ static int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction
             exit(1);
         }
         break;
+        
+    case JP_A: //à tester
+        addr = (full_instruction & 0x0FFF);
+
+        cpu->PC = addr;
+        break;
 
     case LD_VB:
         x = (full_instruction & 0x0F00) >> 8;
         byte = full_instruction & 0x00FF;
 
         cpu->Vx[x] = byte;
+        break;
+
+    case ADD_VB:
+        x = (full_instruction & 0x0F00) >> 8;
+        byte = full_instruction & 0x00FF;
+
+        cpu->Vx[x] += byte;
         break;
 
     case LD_IA:
@@ -199,11 +212,6 @@ static int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction
 
         Display_DRW(cpu->display_ptr, &sprite, cpu->Vx[x], cpu->Vx[y], &(cpu->Vx[0xF]));
         Sprite_destroy(&sprite);
-        break;
-    
-    case JP_A: //à tester
-        addr = (full_instruction & 0x0FFF);
-        cpu->PC = addr;
         break;
     default:
         return -1; // error
