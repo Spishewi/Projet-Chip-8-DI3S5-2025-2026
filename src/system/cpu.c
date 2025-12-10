@@ -150,7 +150,7 @@ static enum CPU_Instruction CPU_decode(uint16_t instruction){
 }
 
 static int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction, uint16_t full_instruction){
-    uint8_t Vx, Vy, n, byte;
+    uint8_t x, y, n, byte;
     uint16_t addr;
 
     switch (decoded_instruction)
@@ -164,10 +164,10 @@ static int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction
         break;
 
     case LD_VB:
-        Vx = (full_instruction & 0x0F00) >> 8;
+        x = (full_instruction & 0x0F00) >> 8;
         byte = full_instruction & 0x00FF;
 
-        cpu->Vx[Vx] = byte;
+        cpu->Vx[x] = byte;
         break;
 
     case LD_IA:
@@ -177,8 +177,8 @@ static int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction
         break;
 
     case DRW:
-        Vx = (full_instruction & 0x0F00) >> 8;
-        Vy = (full_instruction & 0x00F0) >> 4;
+        x = (full_instruction & 0x0F00) >> 8;
+        y = (full_instruction & 0x00F0) >> 4;
         n = full_instruction & 0x000F;
 
         struct Sprite sprite;
@@ -188,13 +188,12 @@ static int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction
             Sprite_add(&sprite, RAM_get_value(cpu->ram_ptr, cpu->I + i));
         }
 
-        Display_DRW(cpu->display_ptr, &sprite, Vx, Vy, &(cpu->Vx[0xF]));
+        Display_DRW(cpu->display_ptr, &sprite, cpu->Vx[x], cpu->Vx[y], &(cpu->Vx[0xF]));
         Sprite_destroy(&sprite);
         break;
     
     case JP_A: //à tester
         addr = (full_instruction & 0x0FFF);
-        
         cpu->PC = addr;
         break;
     default:
@@ -205,12 +204,12 @@ static int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction
 
 /*Do a fetch-decode-execute cycle*/
 int CPU_FDE(struct CPU* cpu){
-    uint8_t full_instruction = CPU_fetch(cpu);
+    uint16_t full_instruction = CPU_fetch(cpu);
     enum CPU_Instruction decoded_instruction = CPU_decode(full_instruction);
+    
     int error_code = CPU_execute(cpu, decoded_instruction, full_instruction);
     if(error_code != 0){
-        //fprintf(stderr, "[error] : CPU execution error. Error code : %d, failed instruction : %d\n", error_code, decoded_instruction);
-        fprintf(stderr, "[error] : CPU execution error. Error code : %d\n", error_code);
+        fprintf(stderr, "[error] : CPU execution error. Error code : %d, failed instruction : 0x%04x\n", error_code, full_instruction);
         exit(1);
     }
     return 0;
