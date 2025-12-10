@@ -27,11 +27,6 @@ int CPU_init(struct CPU* cpu, struct RAM* ram, struct Display* display){
     return 0;
 }
 
-/*free the CPU*/
-void CPU_destroy(struct CPU* cpu){
-    free(cpu);
-}
-
 /*Fetch the next instruction*/
 static uint16_t CPU_fetch(struct CPU* cpu){
     /*get the current instruction from ram*/

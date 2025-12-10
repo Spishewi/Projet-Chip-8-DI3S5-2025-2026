@@ -70,11 +70,8 @@ enum CPU_Instruction {
     UNKNOWN
 };
 
-/*allocate and initialize a CPU*/
+/*initialize a CPU*/
 int CPU_init(struct CPU* cpu, struct RAM* ram, struct Display* display);
-
-/*free the CPU*/
-void CPU_destroy(struct CPU* cpu);
 
 /*Do a fetch-decode-execute cycle*/
 int CPU_FDE(struct CPU* cpu);

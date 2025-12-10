@@ -82,7 +82,5 @@ int main(int argc, char** argv){
     
     /*free all the memory*/
     Display_destroy(&display);
-    CPU_destroy(&cpu);
-
     return 0;
 }
