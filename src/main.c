@@ -10,8 +10,8 @@
 
 int main(int argc, char** argv){
     struct RAM* ram = RAM_init();
-    ROM_load_to_ram("./roms/1-chip8-logo.ch8", ram, 0x200);
-    //RAM_print_instructions(ram, 0x200, 39);
+    //ROM_load_to_ram("./roms/1-chip8-logo.ch8", ram, 0x200);
+    ROM_load_to_ram("./roms/2-ibm-logo.ch8", ram, 0x200);
 
     // TODO TEST ERRORS
 
