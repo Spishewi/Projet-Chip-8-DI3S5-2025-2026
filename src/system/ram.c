@@ -5,25 +5,6 @@
 #include <misc/debug.h>
 #include <system/ram.h>
 
-/*allocate the RAM array*/
-int RAM_init(struct RAM* ram){
-    /*allocate the RAM array*/
-    /*uses calloc to allocate the memory and set it to 0*/
-    ram->ram_array = calloc(RAM_SIZE, sizeof(uint8_t));
-
-    /*if the allocation havn't worked, return NULL*/
-    if(!ram->ram_array){
-        return 1;
-    }
-
-    return 0;
-}
-
-/*free the RAM array*/
-void RAM_Destroy(struct RAM* ram){
-    free(ram);
-}
-
 /*set all the RAM to 0*/
 void RAM_clear(struct RAM* ram){
     for(int i=0; i<RAM_SIZE; i++){

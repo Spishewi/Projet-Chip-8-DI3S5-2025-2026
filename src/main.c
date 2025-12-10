@@ -19,12 +19,8 @@ int main(int argc, char** argv){
     char* rom_file_path = argv[1];
     printf("Running ROM : \"%s\".", rom_file_path);
 
-    /*initialize the RAM*/
+    /*create the RAM*/
     struct RAM ram;
-    if(RAM_init(&ram)){
-        fprintf(stderr, "[ERROR] : RAM initialization error.\n");
-        return 1;
-    }
 
     /*load a ROM into the RAM*/
     if(ROM_load_to_ram(rom_file_path, &ram, 0x200)){
@@ -89,7 +85,6 @@ int main(int argc, char** argv){
     /*free all the memory*/
     Display_destroy(&display);
     CPU_destroy(&cpu);
-    RAM_Destroy(&ram);
 
     return 0;
 }

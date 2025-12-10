@@ -7,14 +7,8 @@
 
 
 struct RAM {
-    uint8_t* ram_array;
+    uint8_t ram_array[RAM_SIZE];
 };
-
-/*allocate the RAM*/
-int RAM_init(struct RAM* ram);
-
-/*free the RAM*/
-void RAM_Destroy(struct RAM* ram);
 
 /*set all the RAM to 0*/
 void RAM_clear(struct RAM* ram);
