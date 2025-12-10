@@ -71,7 +71,7 @@ enum CPU_Instruction {
 };
 
 /*allocate and initialize a CPU*/
-struct CPU* CPU_init(struct RAM* ram, struct Display* display);
+int CPU_init(struct CPU* cpu, struct RAM* ram, struct Display* display);
 
 /*free the CPU*/
 void CPU_destroy(struct CPU* cpu);

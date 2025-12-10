@@ -5,17 +5,7 @@
 #include "system/ram.h"
 
 /*allocate and initialize a CPU*/
-struct CPU* CPU_init(struct RAM* ram, struct Display* display){
-    /*allocate the CPU*/
-    /*uses malloc to allocate the memory*/
-    struct CPU* cpu = malloc(sizeof(struct CPU));
-
-    /*if the allocation haven't worked, exit with an error*/
-    if(!cpu){
-        fprintf(stderr, "[ERROR] : CPU cannot be allocated.");
-        exit(1);
-    }
-
+int CPU_init(struct CPU* cpu, struct RAM* ram, struct Display* display){
     /*set default values*/
     /*registers*/
     for(int i=0; i<CPU_VX_NUMBER; i++) cpu->Vx[i] = 0;
@@ -34,7 +24,7 @@ struct CPU* CPU_init(struct RAM* ram, struct Display* display){
     cpu->ram_ptr = ram;
     cpu->display_ptr = display;
 
-    return cpu;
+    return 0;
 }
 
 /*free the CPU*/
