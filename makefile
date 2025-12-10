@@ -8,7 +8,7 @@ ifeq ($(OS),Windows_NT)
     EXE_EXT := .exe
     RM_DIR  := rmdir /S /Q
     MKDIR_P = if not exist "$(1)" mkdir "$(1)"
-	LDFLAGS := -Llib/mingw64/ -lprovided -lSDL2 -lm
+	LDFLAGS := -Llib/mingw64/ -lprovided -lmingw32 -lSDL2main -lSDL2 -lm
 else
     OS_NAME := $(shell uname -s)
     EXE_EXT :=

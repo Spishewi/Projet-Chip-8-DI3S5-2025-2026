@@ -156,7 +156,11 @@ static int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction
     switch (decoded_instruction)
     {
     case CLS:
-        Display_CLS(cpu->display_ptr);
+        int errCLS = Display_CLS(cpu->display_ptr);
+        if(errCLS != 0){
+            fprintf(stderr, "[error] : CLS execution error. Error code : %d\n", errCLS);
+            exit(1);
+        }
         break;
 
     case LD_VB:
@@ -205,6 +209,7 @@ int CPU_FDE(struct CPU* cpu){
     enum CPU_Instruction decoded_instruction = CPU_decode(full_instruction);
     int error_code = CPU_execute(cpu, decoded_instruction, full_instruction);
     if(error_code != 0){
+        //fprintf(stderr, "[error] : CPU execution error. Error code : %d, failed instruction : %d\n", error_code, decoded_instruction);
         fprintf(stderr, "[error] : CPU execution error. Error code : %d\n", error_code);
         exit(1);
     }
