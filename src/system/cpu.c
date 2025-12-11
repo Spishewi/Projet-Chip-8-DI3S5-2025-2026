@@ -28,14 +28,17 @@ int CPU_init(struct CPU* cpu, struct RAM* ram, struct Display* display){
 }
 
 /*Fetch the next instruction*/
-static uint16_t CPU_fetch(struct CPU* cpu){
+static int CPU_fetch(struct CPU* cpu, uint16_t* instruction){
     /*get the current instruction from ram*/
-    uint16_t instruction = RAM_get_instruction(cpu->ram_ptr, cpu->PC);
+    int error_code = 0;
+
+    error_code = RAM_get_instruction(cpu->ram_ptr, cpu->PC, instruction);
+    if(error_code) return 1; // RAM get instruction error
 
     /*increment the program counter*/
     cpu->PC += 2;
 
-    return instruction;
+    return 0;
 }
 
 /*Decode an instruction*/
@@ -141,20 +144,17 @@ static enum CPU_Instruction CPU_decode(uint16_t instruction){
 
 /*extract data from uint16_t instruction and execute it (precondition: ` decoded_instruction` and `full_instruction` must be coherent)*/
 static int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction, uint16_t full_instruction){
-
     /*define variables that can be used to extract data from an instruction*/
-    uint8_t x, y, n, byte;
+    int error_code = 0;
+    uint8_t x, y, n, byte, ram_value;
     uint16_t addr;
 
     /*execute all instruction based on the decoded instruction*/
     switch (decoded_instruction)
     {
     case CLS: // 00E0
-        int errCLS = Display_CLS(cpu->display_ptr);
-        if(errCLS != 0){
-            fprintf(stderr, "[error] : CLS execution error. Error code : %d\n", errCLS);
-            exit(1);
-        }
+        int error_code = Display_CLS(cpu->display_ptr);
+        if(error_code) return 2; // CLS error
         break;
         
     case RET: // 00EE
@@ -245,17 +245,24 @@ static int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction
         n = full_instruction & 0x000F;
 
         struct Sprite sprite;
-        Sprite_init(&sprite, n);
+        error_code = Sprite_init(&sprite, n);
+        if(error_code) return 2; // Sprite init error
 
         for (unsigned int i = 0; i < n; i++){
-            Sprite_add(&sprite, RAM_get_value(cpu->ram_ptr, cpu->I + i));
+            error_code = RAM_get_value(cpu->ram_ptr, cpu->I + i, &ram_value);
+            if(error_code) return 3; // RAM get value error
+
+            error_code = Sprite_add(&sprite, ram_value);
+            if(error_code) return 4; // Sprite add error
         }
 
-        Display_DRW(cpu->display_ptr, &sprite, cpu->Vx[x], cpu->Vx[y], &(cpu->Vx[0xF]));
+        error_code = Display_DRW(cpu->display_ptr, &sprite, cpu->Vx[x], cpu->Vx[y], &(cpu->Vx[0xF]));
+        if(error_code) return 5; // Display DRW error
+
         Sprite_destroy(&sprite);
         break;
     default:
-        return -1; // error
+        return 1;
     }
     return 0;
 }
@@ -263,20 +270,20 @@ static int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction
 /*Do a fetch-decode-execute cycle*/
 int CPU_FDE(struct CPU* cpu){
     /*fetch*/
-    uint16_t full_instruction = CPU_fetch(cpu);
+    int error_code = 0;
+    uint16_t full_instruction;
+
+    error_code = CPU_fetch(cpu, &full_instruction);
+    if(error_code) return 1; // fetch error
 
     /*decode*/
     enum CPU_Instruction decoded_instruction = CPU_decode(full_instruction);
-    if(decoded_instruction == UNKNOWN){
-        fprintf(stderr, "[error] : CPU decoding error : unknown instruction 0x%04x\n", full_instruction);
-        exit(1);
-    }
+    if(decoded_instruction == UNKNOWN) return 2; // decode error
+    
     
     /*execute*/
-    int error_code = CPU_execute(cpu, decoded_instruction, full_instruction);
-    if(error_code != 0){
-        fprintf(stderr, "[error] : CPU execution error. Error code : %d, failed instruction : 0x%04x\n", error_code, full_instruction);
-        exit(1);
-    }
+    error_code = CPU_execute(cpu, decoded_instruction, full_instruction);
+    if(error_code) return 3; // execute error
+
     return 0;
 }

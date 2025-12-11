@@ -6,89 +6,84 @@
 #include <system/ram.h>
 
 /*set all the RAM to 0*/
-void RAM_clear(struct RAM* ram){
+int RAM_clear(struct RAM* ram){
+    int error_code = 0;
+
     for(int i=0; i<RAM_SIZE; i++){
-        RAM_set_value(ram, i, 0);
+        error_code = RAM_set_value(ram, i, 0);
+        if(error_code) return 1;
     }
+
+    return 0;
 }
 
 /*set a value in the RAM*/
-void RAM_set_value(struct RAM* ram, uint16_t address, uint8_t value){
-    if(address >= RAM_SIZE)
-    {
-        fprintf(stderr, "[ERROR] : trying to set value at incorrect address 0x%04x.", address);
-        exit(1);
-    }
+int RAM_set_value(struct RAM* ram, uint16_t address, uint8_t value){
+    if(address >= RAM_SIZE) return 1;
+
     /*set the value in the ram*/
     ram->ram_array[address] = value;
+    return 0;
 }
 
 /*get value from the RAM*/
-uint8_t RAM_get_value(struct RAM* ram, uint16_t address){
-    if(address >= RAM_SIZE)
-    {
-        fprintf(stderr, "[ERROR] : trying to get value from incorrect address 0x%04x.", address);
-        exit(1);
-    }
-    return ram->ram_array[address];
+int RAM_get_value(struct RAM* ram, uint16_t address, uint8_t* value){
+    if(address >= RAM_SIZE) return 1;
+
+    /*store the value in the storage variable*/
+    *value = ram->ram_array[address];
+    return 0;
 }
 
 /*set an instruction in the RAM (an instruction is 16 bits instead of 8 bits for a value)*/
-void RAM_set_instruction(struct RAM* ram, uint16_t address, uint16_t instruction){
+int RAM_set_instruction(struct RAM* ram, uint16_t address, uint16_t instruction){
+    int error_code = 0;
+
     /*split the instruction into two bytes to be able to set them in ram properly*/
     uint8_t first_value = (instruction >> 8) & 0xff; // masking is optionnal, but it make more readable as it helps to understand what's going on
     uint8_t second_value = (instruction) & 0xff; // masking is optionnal, but it make more readable as it helps to understand what's going on
 
-    RAM_set_value(ram, address, first_value);
-    RAM_set_value(ram, address + 1, second_value);
-}
+    error_code = RAM_set_value(ram, address, first_value);
+    if(error_code) return 1;
 
-/*set a block of data in the RAM*/
-void RAM_set_block(struct RAM* ram, uint16_t address, uint8_t* block, uint16_t block_size){
-    if (address + block_size >= RAM_SIZE){
-        fprintf(stderr, "[ERROR] : trying to set block outside the RAM.");
-        exit(1);
-    }
-    for(unsigned int i = 0; i < block_size; i++){
-        RAM_set_value(ram, address + i, block[i]);
-    }
-}
+    error_code = RAM_set_value(ram, address + 1, second_value);
+    if(error_code) return 2;
 
-/*get a block of data from the RAM. /!\ the block is a pointer to the RAM, so it will be lost if the RAM is freed*/
-const uint8_t* RAM_get_block(struct RAM* ram, uint16_t address, uint16_t block_size){
-    if (address + block_size >= RAM_SIZE){
-        fprintf(stderr, "[ERROR] : trying to get block from outside the RAM.");
-        exit(1);
-    }
-
-    return &(ram->ram_array[address]);
+    return 0;
 }
 
 /*get an instruction in the RAM (an instruction is 16 bits instead of 8 bits for a value)*/
-uint16_t RAM_get_instruction(struct RAM* ram, uint16_t address){
-    uint8_t first_value = RAM_get_value(ram, address);
-    uint8_t second_value = RAM_get_value(ram, address + 1);
+int RAM_get_instruction(struct RAM* ram, uint16_t address, uint16_t* instruction){
+    int error_code = 0;
+    uint8_t first_value;
+    uint8_t second_value;
+
+    /*get the two bytes of the instruction*/
+    error_code = RAM_get_value(ram, address, &first_value);
+    if(error_code) return 1;
+
+    error_code = RAM_get_value(ram, address + 1, &second_value);
+    if(error_code) return 2;
     
     // concatenate the two bytes into one instruction
-    return (first_value << 8) | second_value;
+    *instruction = (first_value << 8) | second_value;
+    return 0;
 }
 
 /*print `n` instructions starting from `start_address`*/
-void RAM_print_instructions(struct RAM* ram, uint16_t start_address, uint16_t n){
-    if(start_address >= RAM_SIZE)
-    {
-        fprintf(stderr, "[ERROR] : trying to get value from incorrect address 0x%04x.", start_address);
-        exit(1);
+int RAM_print_instructions(struct RAM* ram, uint16_t start_address, uint16_t n){
+    int error_code = 0;
+    uint16_t instruction;
+
+    if(start_address >= RAM_SIZE) return 1;
+    if(start_address + n*sizeof(uint16_t) >= RAM_SIZE) return 2;
+
+    for (unsigned int i = 0; i < n; i++){
+        error_code = RAM_get_instruction(ram, start_address + i*sizeof(uint16_t), &instruction);
+        if(error_code) return 1;
+
+        printf("%s\n", instruction_as_str(instruction));
     }
-    if(start_address + n*sizeof(uint16_t) >= RAM_SIZE)
-    {
-        fprintf(stderr, "[ERROR] : too many instructions to read 0x%04x.", (uint16_t)(start_address + n*sizeof(uint16_t)));
-        exit(1);
-    }
-    else{
-        for (unsigned int i = 0; i < n; i++){
-            uint16_t instruction = RAM_get_instruction(ram, start_address + i*sizeof(uint16_t));
-            printf("%s\n", instruction_as_str(instruction));
-        }
-    }
+
+    return  0;
 }
