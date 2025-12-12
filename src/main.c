@@ -11,7 +11,7 @@
 int main(int argc, char** argv){
     /*handling the arguments*/
     if(argc != 2){
-        fprintf(stderr, "[Error] : Missing ROM file in the arguments.\n");
+        fprintf(stderr, "[ERROR] : Missing ROM file in the arguments.\n");
         return 1;
     }
 
@@ -32,7 +32,7 @@ int main(int argc, char** argv){
     struct Display display;
     if (Display_init(&display, 10))
     {
-        fprintf(stderr, "[Error] : Display initialisation error.\n");
+        fprintf(stderr, "[ERROR] : Display initialisation error.\n");
         return 1;
     }
     printf("Display initialized.\n");
@@ -40,7 +40,7 @@ int main(int argc, char** argv){
     /*set the colors of the display*/
     if (Display_set_colors(&display, 0, 0, 0, 0, 0, 255))
     {
-        fprintf(stderr, "[Error] : Display was not able to set its color\n");
+        fprintf(stderr, "[ERROR] : Display was not able to set its color\n");
         return 1;
     }
     printf("Display color set.\n"); 
