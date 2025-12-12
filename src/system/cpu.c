@@ -413,14 +413,14 @@ int CPU_FDE(struct CPU* cpu){
 
     error_code = CPU_fetch(cpu, &full_instruction);
     if(error_code){
-        fprintf(stderr, "[Error] : CPU fetch error.\n");
+        fprintf(stderr, "[ERROR] : CPU fetch error.\n");
         return 1; // fetch error
     }
 
     /*decode*/
     enum CPU_Instruction decoded_instruction = CPU_decode(full_instruction);
     if(decoded_instruction == UNKNOWN){
-        fprintf(stderr, "[Error] : CPU decode error.\n");
+        fprintf(stderr, "[ERROR] : CPU decode error.\n");
         return 2; // decode error
     }
     
@@ -428,7 +428,7 @@ int CPU_FDE(struct CPU* cpu){
     /*execute*/
     error_code = CPU_execute(cpu, decoded_instruction, full_instruction);
     if(error_code){
-        fprintf(stderr, "[Error] : CPU execute error.\n");
+        fprintf(stderr, "[ERROR] : CPU execute error.\n");
         return 3; // execute error
     }
 
