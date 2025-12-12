@@ -242,6 +242,80 @@ static int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction
         cpu->Vx[x] = cpu->Vx[y];
         break;
 
+    case OR_VV: // 8xy1
+        x = (full_instruction & 0x0F00) >> 8;
+        y = (full_instruction & 0x00F0) >> 4;
+
+        cpu->Vx[x] = cpu->Vx[x] | cpu->Vx[y];
+        break;
+
+    case AND_VV: // 8xy2
+        x = (full_instruction & 0x0F00) >> 8;
+        y = (full_instruction & 0x00F0) >> 4;
+
+        cpu->Vx[x] = cpu->Vx[x] & cpu->Vx[y];
+        break;
+
+    case XOR_VV: // 8xy3
+        x = (full_instruction & 0x0F00) >> 8;
+        y = (full_instruction & 0x00F0) >> 4;
+
+        cpu->Vx[x] = cpu->Vx[x] ^ cpu->Vx[y];
+        break;
+
+    case ADD_VV: // 8xy4
+        x = (full_instruction & 0x0F00) >> 8;
+        y = (full_instruction & 0x00F0) >> 4;
+
+        /*use uint16_t to see if it's bigger than an uint8_t to set the carry*/
+        if(((uint16_t) cpu->Vx[x] + (uint16_t) cpu->Vx[y]) > 0xFF) cpu->Vx[0xF] = 1;
+        else cpu->Vx[0xF] = 0;
+
+        cpu->Vx[x] = cpu->Vx[x] + cpu->Vx[y];
+        break;
+
+    case SUB_VV: // 8xy5
+        x = (full_instruction & 0x0F00) >> 8;
+        y = (full_instruction & 0x00F0) >> 4;
+        
+        /*we set if there is a carry*/
+        if(cpu->Vx[x] > cpu->Vx[y]) cpu->Vx[0xF] = 1;
+        else cpu->Vx[0xF] = 0;
+
+        cpu->Vx[x] = cpu->Vx[x] - cpu->Vx[y];
+        break;
+
+    case SHR: // 8xy6
+        x = (full_instruction & 0x0F00) >> 8;
+        
+        /*we set the carry*/
+        cpu->Vx[0xF] = cpu->Vx[x] & 1;
+
+        /*we divide by 2*/
+        cpu->Vx[x] = cpu->Vx[x] >> 1;
+        break;
+
+    case SUBN_VV: // 8xy7
+        x = (full_instruction & 0x0F00) >> 8;
+        y = (full_instruction & 0x00F0) >> 4;
+        
+        /*we set if there is a carry*/
+        if(cpu->Vx[y] > cpu->Vx[x]) cpu->Vx[0xF] = 0b00000001;
+        else cpu->Vx[0xF] = 0;
+
+        cpu->Vx[x] = cpu->Vx[y] - cpu->Vx[x];
+        break;
+
+    case SHL: // 8xyE
+        x = (full_instruction & 0x0F00) >> 8;
+        
+        /*we set the carry*/
+        cpu->Vx[0xF] = (cpu->Vx[x] & 0b10000000) >> 7;
+
+        /*we multiply by 2*/
+        cpu->Vx[x] = cpu->Vx[x] << 1;
+        break;
+
     case SNE_VV: // 9xy0
         x = (full_instruction & 0x0F00) >> 8;
         y = (full_instruction & 0x00F0) >> 4;
@@ -257,7 +331,7 @@ static int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction
         cpu->I = addr;
         break;
 
-    case DRW:
+    case DRW: // Dxyn
         x = (full_instruction & 0x0F00) >> 8;
         y = (full_instruction & 0x00F0) >> 4;
         n = full_instruction & 0x000F;
@@ -285,6 +359,46 @@ static int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction
 
         Sprite_destroy(&sprite);
         break;
+    
+    case ADD_IV: // Fx1E
+        x = (full_instruction & 0x0F00) >> 8;
+
+        cpu->I = cpu->I + cpu->Vx[x];
+        break;
+
+    case LD_BV: // Fx33
+        x = (full_instruction & 0x0F00) >> 8;
+
+        error_code = RAM_set_value(cpu->ram_ptr, cpu->I, cpu->Vx[x] / 100);
+        if(error_code) return 2;
+
+        error_code = RAM_set_value(cpu->ram_ptr, cpu->I + 1, (cpu->Vx[x] / 10) % 10);
+        if(error_code) return 3;
+
+        error_code = RAM_set_value(cpu->ram_ptr, cpu->I + 2, cpu->Vx[x] % 10);
+        if(error_code) return 4;
+        break;
+
+    case LD_IV: // Fx55
+        x = (full_instruction & 0x0F00) >> 8;
+
+        for(unsigned int i = 0; i <= x; i++){
+            error_code = RAM_set_value(cpu->ram_ptr, cpu->I + i, cpu->Vx[i]);
+            if(error_code) return 2;
+        }
+        break;
+
+    case LD_VI: // Fx65
+        x = (full_instruction & 0x0F00) >> 8;
+
+        for(unsigned int i = 0; i <= x; i++){
+            error_code = RAM_get_value(cpu->ram_ptr, cpu->I + i, &ram_value);
+            if(error_code) return 2;
+
+            cpu->Vx[i] = ram_value;
+        }
+        break;
+
     default:
         return 1;
     }
