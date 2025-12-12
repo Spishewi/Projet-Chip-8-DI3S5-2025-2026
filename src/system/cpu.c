@@ -152,16 +152,26 @@ static int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction
     /*execute all instruction based on the decoded instruction*/
     switch (decoded_instruction)
     {
+    case SYS: // 0nnn
+        addr = full_instruction & 0x0FFF;
+        cpu->PC = addr;
+        break;
+
     case CLS: // 00E0
         int error_code = Display_CLS(cpu->display_ptr);
         if(error_code){
-            fprintf(stderr, "[Error] : Display CLS error.\n");
+            fprintf(stderr, "[ERROR] : Display CLS error.\n");
             return 2; // CLS error
         }
         break;
         
     case RET: // 00EE
-        cpu->PC = cpu->SP;
+        if(cpu->SP <= 0){
+            fprintf(stderr, "[ERROR] : RET error, the stack pointer is already at the bottom.\n");
+            return 2; // RET error
+        }
+
+        cpu->PC = cpu->Sx[cpu->SP];
         cpu->SP -= 1;
         break;
     
@@ -174,8 +184,13 @@ static int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction
     case CALL: // 2nnn
         addr = (full_instruction & 0x0FFF);
 
+        if(cpu->SP >= CPU_STACK_SIZE){
+            fprintf(stderr, "[ERROR] : CALL error, stack overflow.\n");
+            return 2; // CALL error
+        }
+
         cpu->SP += 1;
-        cpu->SP += cpu->PC;
+        cpu->Sx[cpu->SP] = cpu->PC;
         cpu->PC = addr;
         break;
         
@@ -257,14 +272,14 @@ static int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction
 
             error_code = Sprite_add(&sprite, ram_value);
             if(error_code){
-                fprintf(stderr, "[Error] : Sprite add error.\n");
+                fprintf(stderr, "[ERROR] : Sprite add error.\n");
                 return 4; // Sprite add error
             }
         }
 
         error_code = Display_DRW(cpu->display_ptr, &sprite, cpu->Vx[x], cpu->Vx[y], &(cpu->Vx[0xF]));
         if(error_code){
-            fprintf(stderr, "[Error] : Display DRW error.\n");
+            fprintf(stderr, "[ERROR] : Display DRW error.\n");
             return 5; // Display DRW error
         }
 
