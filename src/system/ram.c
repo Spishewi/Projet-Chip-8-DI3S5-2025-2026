@@ -19,7 +19,10 @@ int RAM_clear(struct RAM* ram){
 
 /*set a value in the RAM*/
 int RAM_set_value(struct RAM* ram, uint16_t address, uint8_t value){
-    if(address >= RAM_SIZE) return 1;
+    if(address >= RAM_SIZE){
+        fprintf(stderr, "[Error] : RAM set value error.\n");
+        return 1;
+    }
 
     /*set the value in the ram*/
     ram->ram_array[address] = value;
@@ -28,7 +31,10 @@ int RAM_set_value(struct RAM* ram, uint16_t address, uint8_t value){
 
 /*get value from the RAM*/
 int RAM_get_value(struct RAM* ram, uint16_t address, uint8_t* value){
-    if(address >= RAM_SIZE) return 1;
+    if(address >= RAM_SIZE){
+        fprintf(stderr, "[Error] : RAM get value error.\n");
+        return 1;
+    }
 
     /*store the value in the storage variable*/
     *value = ram->ram_array[address];

@@ -54,6 +54,7 @@ int main(int argc, char** argv){
 
     /*main loop (run the fetch-decode-execute cycle)*/
     bool running = true;
+    bool pause = false;
     while (running)
     {
         /*process events to have a reponding window and a working close button*/
@@ -67,19 +68,30 @@ int main(int argc, char** argv){
             }
         }
 
+        if(pause) continue;
+
         /*debug*/
-        RAM_print_instructions(&ram, cpu.PC, 1);
+        if(RAM_print_instructions(&ram, cpu.PC, 1)){
+            fprintf(stderr, "[ERROR] : RAM print instructions error.\n");
+            pause = true;
+        }
 
         /*run one FDE cycle*/
-        CPU_FDE(&cpu);
+        if(CPU_FDE(&cpu)){
+            fprintf(stderr, "[ERROR] : CPU FDE error.\n");
+            pause = true;
+        }
 
         /*update the screen*/
-        Display_update(&display);
+        if(Display_update(&display)){
+            fprintf(stderr, "[ERROR] : Display update error.\n");
+            pause = true;
+        }
 
         /*wait reduce the speed of the emulator and have a playable game*/
         SDL_Delay(25);
     }
-    
+
     /*free all the memory*/
     Display_destroy(&display);
     return 0;

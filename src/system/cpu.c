@@ -154,7 +154,10 @@ static int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction
     {
     case CLS: // 00E0
         int error_code = Display_CLS(cpu->display_ptr);
-        if(error_code) return 2; // CLS error
+        if(error_code){
+            fprintf(stderr, "[Error] : Display CLS error.\n");
+            return 2; // CLS error
+        }
         break;
         
     case RET: // 00EE
@@ -253,11 +256,17 @@ static int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction
             if(error_code) return 3; // RAM get value error
 
             error_code = Sprite_add(&sprite, ram_value);
-            if(error_code) return 4; // Sprite add error
+            if(error_code){
+                fprintf(stderr, "[Error] : Sprite add error.\n");
+                return 4; // Sprite add error
+            }
         }
 
         error_code = Display_DRW(cpu->display_ptr, &sprite, cpu->Vx[x], cpu->Vx[y], &(cpu->Vx[0xF]));
-        if(error_code) return 5; // Display DRW error
+        if(error_code){
+            fprintf(stderr, "[Error] : Display DRW error.\n");
+            return 5; // Display DRW error
+        }
 
         Sprite_destroy(&sprite);
         break;
@@ -274,16 +283,25 @@ int CPU_FDE(struct CPU* cpu){
     uint16_t full_instruction;
 
     error_code = CPU_fetch(cpu, &full_instruction);
-    if(error_code) return 1; // fetch error
+    if(error_code){
+        fprintf(stderr, "[Error] : CPU fetch error.\n");
+        return 1; // fetch error
+    }
 
     /*decode*/
     enum CPU_Instruction decoded_instruction = CPU_decode(full_instruction);
-    if(decoded_instruction == UNKNOWN) return 2; // decode error
+    if(decoded_instruction == UNKNOWN){
+        fprintf(stderr, "[Error] : CPU decode error.\n");
+        return 2; // decode error
+    }
     
     
     /*execute*/
     error_code = CPU_execute(cpu, decoded_instruction, full_instruction);
-    if(error_code) return 3; // execute error
+    if(error_code){
+        fprintf(stderr, "[Error] : CPU execute error.\n");
+        return 3; // execute error
+    }
 
     return 0;
 }
