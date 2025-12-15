@@ -1,5 +1,7 @@
 #include <stdint.h>
 #include <display/display.h>
+#include <keyboard/keyboard.h>
+#include <speaker/speaker.h>
 
 #include "system/ram.h"
 
@@ -28,6 +30,8 @@ struct CPU {
     /*useful pointers*/
     struct RAM* ram_ptr;
     struct Display* display_ptr;
+    struct Keyboard* keyboard_ptr;
+    struct Speaker* speaker_ptr;
 };
 
 /*enumeration representing all the instructions supported by a chip-8 CPU*/
