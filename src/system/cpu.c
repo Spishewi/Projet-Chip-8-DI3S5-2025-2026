@@ -270,9 +270,9 @@ static int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction
         x = (full_instruction & 0x0F00) >> 8;
         y = (full_instruction & 0x00F0) >> 4;
 
+        /*we calculate if there is a carry*/
         /*use uint16_t to see if it's bigger than an uint8_t to set the carry*/
-        if(((uint16_t) cpu->Vx[x] + (uint16_t) cpu->Vx[y]) > 0xFF) tmp = 1;
-        else tmp = 0;
+        tmp = ((uint16_t) cpu->Vx[x] + (uint16_t) cpu->Vx[y]) > 0xFF;
 
         cpu->Vx[x] = cpu->Vx[x] + cpu->Vx[y];
         cpu->Vx[0xF] = tmp;
@@ -282,11 +282,13 @@ static int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction
         x = (full_instruction & 0x0F00) >> 8;
         y = (full_instruction & 0x00F0) >> 4;
         
-        /*we set if there is a carry*/ // A SURVEILLER LE >= SI IL Y A DES ERREURS
-        if(cpu->Vx[x] >= cpu->Vx[y]) tmp = 1;
-        else tmp = 0;
+        /*we calculate if there is a carry*/
+        tmp = cpu->Vx[x] >= cpu->Vx[y];
 
+        /*do the calculation*/
         cpu->Vx[x] = cpu->Vx[x] - cpu->Vx[y];
+
+        /*we set the carry*/
         cpu->Vx[0xF] = tmp;
         break;
 
@@ -318,11 +320,14 @@ static int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction
     case SHL: // 8xyE
         x = (full_instruction & 0x0F00) >> 8;
         
-        /*we set the carry*/
-        cpu->Vx[0xF] = (cpu->Vx[x] & 0b10000000) >> 7;
+        /*we calculate if there is a carry*/
+        tmp = (cpu->Vx[x] & 0b10000000) >> 7;
 
         /*we multiply by 2*/
         cpu->Vx[x] = cpu->Vx[x] << 1;
+
+        /*we set the carry*/
+        cpu->Vx[0xF] = tmp;
         break;
 
     case SNE_VV: // 9xy0
