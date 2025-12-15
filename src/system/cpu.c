@@ -318,10 +318,13 @@ static int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction
         x = (full_instruction & 0x0F00) >> 8;
         
         /*we set the carry*/
-        cpu->Vx[0xF] = (cpu->Vx[x] & 0b10000000) >> 7;
+        tmp = (cpu->Vx[x] & 0b10000000) >> 7;
 
         /*we multiply by 2*/
         cpu->Vx[x] = cpu->Vx[x] << 1;
+
+        /*we set the carry*/
+        cpu->Vx[0xF] = tmp;
         break;
 
     case SNE_VV: // 9xy0
