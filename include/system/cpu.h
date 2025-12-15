@@ -75,7 +75,7 @@ enum CPU_Instruction {
 };
 
 /*initialize a CPU*/
-int CPU_init(struct CPU* cpu, struct RAM* ram, struct Display* display);
+int CPU_init(struct CPU* cpu, struct RAM* ram, struct Display* display, struct Keyboard* keyboard, struct Speaker* speaker);
 
 /*Do a fetch-decode-execute cycle*/
 int CPU_FDE(struct CPU* cpu);
