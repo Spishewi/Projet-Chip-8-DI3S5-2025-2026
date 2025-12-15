@@ -157,6 +157,7 @@ static int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction
     uint16_t addr;
 
     struct Sprite sprite;
+    int key_id;
     uint8_t tmp;
 
     /*execute all instruction based on the decoded instruction*/
@@ -399,25 +400,25 @@ static int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction
     case SKP: // Ex9E
         x = (full_instruction & 0x0F00) >> 8;
 
-        error_code = Keyboard_get(cpu->keyboard_ptr, cpu->Vx[x], &tmp);
+        error_code = Keyboard_get(cpu->keyboard_ptr, cpu->Vx[x], &key_id);
         if(error_code){
             fprintf(stderr, "[ERROR] : Keyboard get error.\n");
             return 2;
         }
 
-        if(tmp == KEY_DOWN) cpu->PC += 2;
+        if(key_id == KEY_DOWN) cpu->PC += 2;
         break;
 
     case SKNP: // ExA1
         x = (full_instruction & 0x0F00) >> 8;
 
-        error_code = Keyboard_get(cpu->keyboard_ptr, cpu->Vx[x], &tmp);
+        error_code = Keyboard_get(cpu->keyboard_ptr, cpu->Vx[x], &key_id);
         if(error_code){
             fprintf(stderr, "[ERROR] : Keyboard get error.\n");
             return 2;
         }
 
-        if(tmp == KEY_UP) cpu->PC += 2;
+        if(key_id == KEY_UP) cpu->PC += 2;
         break;
 
     case LD_VDT: //Fx07
