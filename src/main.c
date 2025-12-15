@@ -45,10 +45,28 @@ int main(int argc, char** argv){
     }
     printf("Display color set.\n"); 
 
+    /*initialize the keyboard*/
+    struct Keyboard keyboard;
+    if (Keyboard_init(&keyboard))
+    {
+        fprintf(stderr, "[ERROR] : Keyboard initialisation error.\n");
+        return 1;
+    }
+    printf("Keyboard initialised.\n");
+
+    /*initialize the speaker*/
+    struct Speaker speaker;
+    if (Speaker_init(&speaker))
+    {
+        fprintf(stderr, "[ERROR] : Speaker initialisation error.\n");
+        return 1;
+    }
+    printf("Speaker initialised.\n");
+
     /*initialize the CPU*/
     struct CPU cpu;
-    if(CPU_init(&cpu, &ram, &display)){
-        fprintf(stderr, "[ERROR] : RAM initialization error.\n");
+    if(CPU_init(&cpu, &ram, &display, &keyboard, &speaker)){
+        fprintf(stderr, "[ERROR] : RAM initialisation error.\n");
         return 1;
     }
 
@@ -93,6 +111,8 @@ int main(int argc, char** argv){
     }
 
     /*free all the memory*/
+    Speaker_destroy(&speaker);
+    Keyboard_destroy(&keyboard);
     Display_destroy(&display);
     return 0;
 }

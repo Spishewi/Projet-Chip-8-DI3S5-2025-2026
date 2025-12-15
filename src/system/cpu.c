@@ -8,7 +8,7 @@
 #include "system/ram.h"
 
 /*allocate and initialize a CPU*/
-int CPU_init(struct CPU* cpu, struct RAM* ram, struct Display* display){
+int CPU_init(struct CPU* cpu, struct RAM* ram, struct Display* display, struct Keyboard* keyboard, struct Speaker* speaker){
     /*set default values*/
     /*registers*/
     for(int i=0; i<CPU_VX_NUMBER; i++) cpu->Vx[i] = 0;
@@ -26,6 +26,8 @@ int CPU_init(struct CPU* cpu, struct RAM* ram, struct Display* display){
     /*pointers*/
     cpu->ram_ptr = ram;
     cpu->display_ptr = display;
+    cpu->keyboard_ptr = keyboard;
+    cpu->speaker_ptr = speaker;
 
     srand(time(NULL)); // initialize randomness
 
