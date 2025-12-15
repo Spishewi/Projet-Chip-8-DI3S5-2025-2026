@@ -161,7 +161,7 @@ static int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction
         break;
 
     case CLS: // 00E0
-        int error_code = Display_CLS(cpu->display_ptr);
+        error_code = Display_CLS(cpu->display_ptr);
         if(error_code){
             fprintf(stderr, "[ERROR] : Display CLS error.\n");
             return 2; // CLS error
@@ -309,11 +309,12 @@ static int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction
         x = (full_instruction & 0x0F00) >> 8;
         y = (full_instruction & 0x00F0) >> 4;
         
-        /*we set if there is a carry*/
-        if(cpu->Vx[y] > cpu->Vx[x]) cpu->Vx[0xF] = 1;
-        else cpu->Vx[0xF] = 0;
+        /*we calculate if there's a carry*/
+        tmp = cpu->Vx[y] >= cpu->Vx[x];
 
+        /*we set the carry*/
         cpu->Vx[x] = cpu->Vx[y] - cpu->Vx[x];
+        cpu->Vx[0xF] = tmp;
         break;
 
     case SHL: // 8xyE
