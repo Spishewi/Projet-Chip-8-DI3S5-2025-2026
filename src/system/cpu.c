@@ -148,7 +148,9 @@ static int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction
     int error_code = 0;
     uint8_t x, y, n, byte, ram_value;
     uint16_t addr;
+
     struct Sprite sprite;
+    uint8_t tmp;
 
     /*execute all instruction based on the decoded instruction*/
     switch (decoded_instruction)
@@ -269,11 +271,11 @@ static int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction
         y = (full_instruction & 0x00F0) >> 4;
 
         /*use uint16_t to see if it's bigger than an uint8_t to set the carry*/
-        if(((uint16_t) cpu->Vx[x] + (uint16_t) cpu->Vx[y]) > 0xFF) byte = 1;
-        else byte = 0;
+        if(((uint16_t) cpu->Vx[x] + (uint16_t) cpu->Vx[y]) > 0xFF) tmp = 1;
+        else tmp = 0;
 
         cpu->Vx[x] = cpu->Vx[x] + cpu->Vx[y];
-        cpu->Vx[0xF] = byte;
+        cpu->Vx[0xF] = tmp;
         break;
 
     case SUB_VV: // 8xy5
@@ -281,21 +283,24 @@ static int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction
         y = (full_instruction & 0x00F0) >> 4;
         
         /*we set if there is a carry*/ // A SURVEILLER LE >= SI IL Y A DES ERREURS
-        if(cpu->Vx[x] >= cpu->Vx[y]) byte = 1;
-        else byte = 0;
+        if(cpu->Vx[x] >= cpu->Vx[y]) tmp = 1;
+        else tmp = 0;
 
         cpu->Vx[x] = cpu->Vx[x] - cpu->Vx[y];
-        cpu->Vx[0xF] = byte;
+        cpu->Vx[0xF] = tmp;
         break;
 
     case SHR: // 8xy6
         x = (full_instruction & 0x0F00) >> 8;
-        
-        /*we set the carry*/
-        cpu->Vx[0xF] = cpu->Vx[x] & 1;
+
+        /*we calculate if there is a carry*/
+        tmp = cpu->Vx[x] & 1;
 
         /*we divide by 2*/
         cpu->Vx[x] = cpu->Vx[x] >> 1;
+
+        /*we set the carry*/
+        cpu->Vx[0xF] = tmp;
         break;
 
     case SUBN_VV: // 8xy7
