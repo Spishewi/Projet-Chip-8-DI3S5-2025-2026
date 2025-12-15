@@ -8,7 +8,7 @@
 #include "system/rom.h"
 #include "system/cpu.h"
 
-int main(int argc, char** argv){
+int main(int argc, char** argv){    
     /*handling the arguments*/
     if(argc != 2){
         fprintf(stderr, "[ERROR] : Missing ROM file in the arguments.\n");

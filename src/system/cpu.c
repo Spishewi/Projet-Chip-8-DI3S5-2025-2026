@@ -1,4 +1,7 @@
 #include <stdint.h>
+#include <stdlib.h>
+#include <time.h>
+
 #include <display/display.h>
 
 #include "system/cpu.h"
@@ -23,6 +26,8 @@ int CPU_init(struct CPU* cpu, struct RAM* ram, struct Display* display){
     /*pointers*/
     cpu->ram_ptr = ram;
     cpu->display_ptr = display;
+
+    srand(time(NULL)); // initialize randomness
 
     return 0;
 }
@@ -343,6 +348,19 @@ static int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction
         addr = (full_instruction & 0x0FFF);
 
         cpu->I = addr;
+        break;
+
+    case JP_VA: // Bnnn
+        addr = (full_instruction & 0x0FFF);
+        cpu->PC = addr + cpu->Vx[0];
+        break;
+
+    case RND: // Cxkk
+        x = (full_instruction & 0x0F00) >> 8;
+        byte = (full_instruction & 0x00ff);
+
+        /*generate random number, get it between 0 and 255, and AND-it with byte*/
+        cpu->Vx[x] = (uint8_t)(rand() % 0xFF) & byte;
         break;
 
     case DRW: // Dxyn
