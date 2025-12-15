@@ -372,6 +372,20 @@ static int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction
 
         Sprite_destroy(&sprite);
         break;
+
+    case LD_VDT: //Fx07
+        x = (full_instruction & 0x0F00) >> 8;
+
+        /*we set Vx at the delay timer*/
+        cpu->Vx[x] = cpu->DT;
+        break;
+
+    case LD_DTV: //Fx15
+        x = (full_instruction & 0x0F00) >> 8;
+
+        /*we set the delay timer*/
+        cpu->DT = cpu->Vx[x];
+        break;
     
     case ADD_IV: // Fx1E
         x = (full_instruction & 0x0F00) >> 8;
