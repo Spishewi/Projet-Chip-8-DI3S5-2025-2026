@@ -3,6 +3,8 @@
 #include <time.h>
 
 #include <display/display.h>
+#include <keyboard/keyboard.h>
+#include <speaker/speaker.h>
 
 #include "system/cpu.h"
 #include "system/ram.h"
@@ -369,7 +371,10 @@ static int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction
         n = full_instruction & 0x000F;
 
         error_code = Sprite_init(&sprite, n);
-        if(error_code) return 2; // Sprite init error
+        if(error_code){
+            fprintf(stderr, "[ERROR] : Sprite init error.\n");
+            return 2; // Sprite init error
+        };
 
         for (unsigned int i = 0; i < n; i++){
             error_code = RAM_get_value(cpu->ram_ptr, cpu->I + i, &ram_value);
@@ -391,6 +396,30 @@ static int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction
         Sprite_destroy(&sprite);
         break;
 
+    case SKP: // Ex9E
+        x = (full_instruction & 0x0F00) >> 8;
+
+        error_code = Keyboard_get(cpu->keyboard_ptr, cpu->Vx[x], &tmp);
+        if(error_code){
+            fprintf(stderr, "[ERROR] : Keyboard get error.\n");
+            return 2;
+        }
+
+        if(tmp == KEY_DOWN) cpu->PC += 2;
+        break;
+
+    case SKNP: // ExA1
+        x = (full_instruction & 0x0F00) >> 8;
+
+        error_code = Keyboard_get(cpu->keyboard_ptr, cpu->Vx[x], &tmp);
+        if(error_code){
+            fprintf(stderr, "[ERROR] : Keyboard get error.\n");
+            return 2;
+        }
+
+        if(tmp == KEY_UP) cpu->PC += 2;
+        break;
+
     case LD_VDT: //Fx07
         x = (full_instruction & 0x0F00) >> 8;
 
@@ -398,11 +427,28 @@ static int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction
         cpu->Vx[x] = cpu->DT;
         break;
 
+    case LD_VK: // Fx0A
+        x = (full_instruction & 0x0F00) >> 8;
+
+        error_code = Keyboard_wait(cpu->keyboard_ptr, &(cpu->Vx[x]));
+        if(error_code){
+            fprintf(stderr, "[ERROR] : Keyboard get error.\n");
+            return 2;
+        }
+        break;
+
     case LD_DTV: //Fx15
         x = (full_instruction & 0x0F00) >> 8;
 
         /*we set the delay timer*/
         cpu->DT = cpu->Vx[x];
+        break;
+
+    case LD_STV: //Fx18
+        x = (full_instruction & 0x0F00) >> 8;
+
+        /*we set the speaker timer*/
+        cpu->ST = cpu->Vx[x];
         break;
     
     case ADD_IV: // Fx1E
