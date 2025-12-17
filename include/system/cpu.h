@@ -80,4 +80,13 @@ int CPU_init(struct CPU* cpu, struct RAM* ram, struct Display* display, struct K
 /*Do a fetch-decode-execute cycle*/
 int CPU_FDE(struct CPU* cpu);
 
+/*Fetch the next instruction*/
+int CPU_fetch(struct CPU* cpu, uint16_t* instruction);
+
+/*Decode an instruction*/
+enum CPU_Instruction CPU_decode(uint16_t instruction);
+
+/*extract data from uint16_t instruction and execute it (precondition: ` decoded_instruction` and `full_instruction` must be coherent)*/
+int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction, uint16_t full_instruction);
+
 #endif

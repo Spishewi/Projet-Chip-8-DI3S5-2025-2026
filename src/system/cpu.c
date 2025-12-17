@@ -37,7 +37,7 @@ int CPU_init(struct CPU* cpu, struct RAM* ram, struct Display* display, struct K
 }
 
 /*Fetch the next instruction*/
-static int CPU_fetch(struct CPU* cpu, uint16_t* instruction){
+int CPU_fetch(struct CPU* cpu, uint16_t* instruction){
     /*get the current instruction from ram*/
     int error_code = 0;
 
@@ -51,7 +51,7 @@ static int CPU_fetch(struct CPU* cpu, uint16_t* instruction){
 }
 
 /*Decode an instruction*/
-static enum CPU_Instruction CPU_decode(uint16_t instruction){
+enum CPU_Instruction CPU_decode(uint16_t instruction){
     /*try to match patterns to decode the instruction*/
     switch (instruction & 0xF000)
     {
@@ -152,7 +152,7 @@ static enum CPU_Instruction CPU_decode(uint16_t instruction){
 }
 
 /*extract data from uint16_t instruction and execute it (precondition: ` decoded_instruction` and `full_instruction` must be coherent)*/
-static int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction, uint16_t full_instruction){
+int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction, uint16_t full_instruction){
     /*define variables that can be used to extract data from an instruction*/
     int error_code = 0;
     uint8_t x, y, n, byte, ram_value;
