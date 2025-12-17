@@ -11,6 +11,8 @@
 
 #define CPU_VX_NUMBER 16
 #define CPU_STACK_SIZE 16
+#define CPU_TIMER_HZ 60
+#define CPU_UPDATE_LIMIT 30 // max number of updates that can be done in one update state call. Used to flatten lag-spikes
 
 /*structure representing a CPU. Needs to be initialized with the`CPU_init` function, and destroyed with the `CPU_destroy` function*/
 struct CPU {
@@ -26,6 +28,8 @@ struct CPU {
     /*timers*/
     uint8_t DT; // delay timer
     uint8_t ST; // sound timer
+
+    uint64_t last_state_update; // used to update timers
 
     /*useful pointers*/
     struct RAM* ram_ptr;
@@ -75,10 +79,10 @@ enum CPU_Instruction {
 };
 
 /*initialize a CPU*/
-int CPU_init(struct CPU* cpu, struct RAM* ram, struct Display* display, struct Keyboard* keyboard, struct Speaker* speaker);
+int CPU_init(struct CPU* cpu, struct RAM* ram, struct Display* display, struct Keyboard* keyboard, struct Speaker* speaker, uint64_t current_timestamp);
 
 /*Do a fetch-decode-execute cycle*/
-int CPU_FDE(struct CPU* cpu);
+int CPU_FDE(struct CPU* cpu, u_int64_t current_timestamp);
 
 /*Fetch the next instruction*/
 int CPU_fetch(struct CPU* cpu, uint16_t* instruction);
@@ -89,4 +93,6 @@ enum CPU_Instruction CPU_decode(uint16_t instruction);
 /*extract data from uint16_t instruction and execute it (precondition: ` decoded_instruction` and `full_instruction` must be coherent)*/
 int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction, uint16_t full_instruction);
 
+/*update timers and sound state*/
+void CPU_update_state(struct CPU* cpu, uint64_t current_timestamp);
 #endif
