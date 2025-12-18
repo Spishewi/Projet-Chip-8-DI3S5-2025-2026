@@ -22,6 +22,9 @@ int main(int argc, char** argv){
     /*create the RAM*/
     struct RAM ram;
 
+    /*set the characters sprites in the RAM*/
+    RAM_init_char_sprites(&ram, 0x000);
+
     /*load a ROM into the RAM*/
     if(ROM_load_to_ram(rom_file_path, &ram, 0x200)){
         fprintf(stderr, "[ERROR] : cannot read ROM at \"%s\".\n", rom_file_path);
