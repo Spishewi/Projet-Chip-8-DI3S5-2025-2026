@@ -43,6 +43,9 @@ int CPU_FDE(struct CPU* cpu, uint64_t current_timestamp){
     int error_code = 0;
     uint16_t full_instruction;
 
+    /*update the state*/
+    CPU_update_state(cpu, current_timestamp);
+
     /*fetch*/
     error_code = CPU_fetch(cpu, &full_instruction);
     if(error_code){
