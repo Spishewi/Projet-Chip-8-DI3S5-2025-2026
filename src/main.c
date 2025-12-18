@@ -65,7 +65,7 @@ int main(int argc, char** argv){
 
     /*initialize the CPU*/
     struct CPU cpu;
-    if(CPU_init(&cpu, &ram, &display, &keyboard, &speaker)){
+    if(CPU_init(&cpu, &ram, &display, &keyboard, &speaker, SDL_GetTicks64())){
         fprintf(stderr, "[ERROR] : RAM initialisation error.\n");
         return 1;
     }
@@ -89,13 +89,14 @@ int main(int argc, char** argv){
         if(pause) continue;
 
         /*debug*/
+        /*
         if(RAM_print_instructions(&ram, cpu.PC, 1)){
             fprintf(stderr, "[ERROR] : RAM print instructions error.\n");
             pause = true;
-        }
+        }*/
 
         /*run one FDE cycle*/
-        if(CPU_FDE(&cpu)){
+        if(CPU_FDE(&cpu, SDL_GetTicks64())){
             fprintf(stderr, "[ERROR] : CPU FDE error.\n");
             pause = true;
         }
@@ -107,7 +108,7 @@ int main(int argc, char** argv){
         }
 
         /*wait reduce the speed of the emulator and have a playable game*/
-        //SDL_Delay(25);
+        SDL_Delay(1);
     }
 
     /*free all the memory*/

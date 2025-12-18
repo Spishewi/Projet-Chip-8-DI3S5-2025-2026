@@ -10,7 +10,7 @@
 #include "system/ram.h"
 
 /*allocate and initialize a CPU*/
-int CPU_init(struct CPU* cpu, struct RAM* ram, struct Display* display, struct Keyboard* keyboard, struct Speaker* speaker){
+int CPU_init(struct CPU* cpu, struct RAM* ram, struct Display* display, struct Keyboard* keyboard, struct Speaker* speaker, uint64_t current_timestamp){
     /*set default values*/
     /*registers*/
     for(int i=0; i<CPU_VX_NUMBER; i++) cpu->Vx[i] = 0;
@@ -25,6 +25,8 @@ int CPU_init(struct CPU* cpu, struct RAM* ram, struct Display* display, struct K
     cpu->DT = 0;
     cpu->ST = 0;
 
+    cpu->last_state_update = current_timestamp;
+
     /*pointers*/
     cpu->ram_ptr = ram;
     cpu->display_ptr = display;
@@ -36,8 +38,41 @@ int CPU_init(struct CPU* cpu, struct RAM* ram, struct Display* display, struct K
     return 0;
 }
 
+/*Do a fetch-decode-execute cycle*/
+int CPU_FDE(struct CPU* cpu, uint64_t current_timestamp){
+    int error_code = 0;
+    uint16_t full_instruction;
+
+    /*fetch*/
+    error_code = CPU_fetch(cpu, &full_instruction);
+    if(error_code){
+        fprintf(stderr, "[ERROR] : CPU fetch error.\n");
+        return 1; // fetch error
+    }
+
+    /*decode*/
+    enum CPU_Instruction decoded_instruction = CPU_decode(full_instruction);
+    if(decoded_instruction == UNKNOWN){
+        fprintf(stderr, "[ERROR] : CPU decode error.\n");
+        return 2; // decode error
+    }
+    
+    
+    /*execute*/
+    error_code = CPU_execute(cpu, decoded_instruction, full_instruction);
+    if(error_code){
+        fprintf(stderr, "[ERROR] : CPU execute error.\n");
+        return 3; // execute error
+    }
+
+    /*update the state*/
+    CPU_update_state(cpu, current_timestamp);
+
+    return 0;
+}
+
 /*Fetch the next instruction*/
-static int CPU_fetch(struct CPU* cpu, uint16_t* instruction){
+int CPU_fetch(struct CPU* cpu, uint16_t* instruction){
     /*get the current instruction from ram*/
     int error_code = 0;
 
@@ -51,7 +86,7 @@ static int CPU_fetch(struct CPU* cpu, uint16_t* instruction){
 }
 
 /*Decode an instruction*/
-static enum CPU_Instruction CPU_decode(uint16_t instruction){
+enum CPU_Instruction CPU_decode(uint16_t instruction){
     /*try to match patterns to decode the instruction*/
     switch (instruction & 0xF000)
     {
@@ -152,7 +187,7 @@ static enum CPU_Instruction CPU_decode(uint16_t instruction){
 }
 
 /*extract data from uint16_t instruction and execute it (precondition: ` decoded_instruction` and `full_instruction` must be coherent)*/
-static int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction, uint16_t full_instruction){
+int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction, uint16_t full_instruction){
     /*define variables that can be used to extract data from an instruction*/
     int error_code = 0;
     uint8_t x, y, n, byte, ram_value;
@@ -507,32 +542,35 @@ static int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction
     return 0;
 }
 
-/*Do a fetch-decode-execute cycle*/
-int CPU_FDE(struct CPU* cpu){
-    /*fetch*/
-    int error_code = 0;
-    uint16_t full_instruction;
+void CPU_update_state(struct CPU* cpu, uint64_t current_timestamp){
+    /*update timers*/
+    uint64_t elapsed_time_since_last_state_update = current_timestamp - cpu->last_state_update;
+    unsigned int lagspike_detected = 0;
 
-    error_code = CPU_fetch(cpu, &full_instruction);
-    if(error_code){
-        fprintf(stderr, "[ERROR] : CPU fetch error.\n");
-        return 1; // fetch error
+    /*do the calculation with double, and then go back to unsigned integers*/
+    uint64_t nb_of_updates_to_do = (uint64_t)((double)elapsed_time_since_last_state_update * (double)CPU_TIMER_HZ / (double)1000);
+
+    /*reduce the number of updates to limit lag spikes (prefere )*/
+    if(nb_of_updates_to_do > CPU_UPDATE_LIMIT){
+        nb_of_updates_to_do = CPU_UPDATE_LIMIT;
+        lagspike_detected = 1;
     }
 
-    /*decode*/
-    enum CPU_Instruction decoded_instruction = CPU_decode(full_instruction);
-    if(decoded_instruction == UNKNOWN){
-        fprintf(stderr, "[ERROR] : CPU decode error.\n");
-        return 2; // decode error
-    }
-    
-    
-    /*execute*/
-    error_code = CPU_execute(cpu, decoded_instruction, full_instruction);
-    if(error_code){
-        fprintf(stderr, "[ERROR] : CPU execute error.\n");
-        return 3; // execute error
-    }
 
-    return 0;
+    if(nb_of_updates_to_do < cpu->DT) cpu->DT -= nb_of_updates_to_do;
+    else cpu->DT = 0;
+
+    if(nb_of_updates_to_do < cpu->ST) cpu->ST -= nb_of_updates_to_do;
+    else cpu->ST = 0;
+
+    /*get the time elapsed that has been substracted by the updates (not the real time elapsed as an maybe we are in-between two updates)*/
+    uint64_t elapsed_time_on_timers = (uint64_t)((double)nb_of_updates_to_do * (double)1000 / (double)CPU_TIMER_HZ);
+
+    /*add elapsed_time_on_timers instead of current_timestamp to let it catch up when a in-between update is finished*/
+    if(!lagspike_detected) cpu->last_state_update += elapsed_time_on_timers;
+    else cpu->last_state_update = current_timestamp; // warp in time to catch up
+
+    /*update speaker*/
+    if(cpu->ST) Speaker_on(cpu->speaker_ptr);
+    else Speaker_off(cpu->speaker_ptr);
 }

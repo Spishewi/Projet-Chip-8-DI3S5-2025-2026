@@ -10,6 +10,10 @@ struct RAM {
     uint8_t ram_array[RAM_SIZE];
 };
 
+uint8_t hexadecimal_char_sprites[16][5] = {
+    [0] = {0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000},
+};
+
 /*set all the RAM to 0*/
 int RAM_clear(struct RAM* ram);
 
@@ -27,5 +31,11 @@ int RAM_get_instruction(struct RAM* ram, uint16_t address, uint16_t* instruction
 
 /*print `n` instructions starting from `start_address`*/
 int RAM_print_instructions(struct RAM* ram, uint16_t start_address, uint16_t n);
+
+/*initialize the char sprites in the RAM*/
+int RAM_init_char_sprites(struct RAM* ram, uint16_t start_address);
+
+/*get the hex char from the RAM*/
+int RAM_get_hex_char(struct RAM* ram, uint16_t start_address, uint8_t character);
 
 #endif
