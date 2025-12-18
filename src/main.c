@@ -23,7 +23,10 @@ int main(int argc, char** argv){
     struct RAM ram;
 
     /*set the characters sprites in the RAM*/
-    RAM_init_char_sprites(&ram, 0x000);
+    if(RAM_init_char_sprites(&ram, 0x0)){
+        fprintf(stderr, "[ERROR] : cannot set the characters sprites in the RAM.\n");
+        return 1;
+    }
 
     /*load a ROM into the RAM*/
     if(ROM_load_to_ram(rom_file_path, &ram, 0x200)){
