@@ -57,7 +57,6 @@ int CPU_FDE(struct CPU* cpu, uint64_t current_timestamp){
         return 2; // decode error
     }
     
-    
     /*execute*/
     error_code = CPU_execute(cpu, decoded_instruction, full_instruction);
     if(error_code){
@@ -498,9 +497,7 @@ int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction, uint1
     case LD_FV: // Fx29
         x = (full_instruction & 0x0F00) >> 8;
 
-        /*There are sprites of the numbers 0 to F stored in the memory
-        between 0x000 and 0x1FF (511). We need to set I to the location
-        of the sprite of the number Vx*/
+        cpu->I = RAM_get_hex_char(cpu->ram_ptr, 0x000, x);
         break;
 
     case LD_BV: // Fx33

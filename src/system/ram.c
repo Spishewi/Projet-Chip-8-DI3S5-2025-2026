@@ -41,6 +41,18 @@ int RAM_get_value(struct RAM* ram, uint16_t address, uint8_t* value){
     return 0;
 }
 
+/*set the characters sprites in the RAM from 0x000 to 0x1FF*/
+int RAM_init_char_sprites(struct RAM* ram, uint16_t start_address){
+    ram->ram_array[start_address] = hexadecimal_char_sprites[16][5];
+    return 0;
+}
+
+/*get the characters sprites from the RAM*/
+int RAM_get_hex_char(struct RAM* ram, uint16_t start_address, uint8_t character){
+    character = hexadecimal_char_sprites[character];
+    return 0;
+}
+
 /*set an instruction in the RAM (an instruction is 16 bits instead of 8 bits for a value)*/
 int RAM_set_instruction(struct RAM* ram, uint16_t address, uint16_t instruction){
     int error_code = 0;
