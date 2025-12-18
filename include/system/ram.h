@@ -10,10 +10,11 @@ struct RAM {
     uint8_t ram_array[RAM_SIZE];
 };
 
-uint8_t hexadecimal_char_sprites[16][5] = {
+/*
+const uint8_t hexadecimal_char_sprites[16][5] = {
     [0] = {0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000},
 };
-
+*/
 /*set all the RAM to 0*/
 int RAM_clear(struct RAM* ram);
 

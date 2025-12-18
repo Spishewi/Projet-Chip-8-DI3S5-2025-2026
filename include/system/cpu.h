@@ -82,7 +82,7 @@ enum CPU_Instruction {
 int CPU_init(struct CPU* cpu, struct RAM* ram, struct Display* display, struct Keyboard* keyboard, struct Speaker* speaker, uint64_t current_timestamp);
 
 /*Do a fetch-decode-execute cycle*/
-int CPU_FDE(struct CPU* cpu, u_int64_t current_timestamp);
+int CPU_FDE(struct CPU* cpu, uint64_t current_timestamp);
 
 /*Fetch the next instruction*/
 int CPU_fetch(struct CPU* cpu, uint16_t* instruction);
