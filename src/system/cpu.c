@@ -43,6 +43,9 @@ int CPU_FDE(struct CPU* cpu, uint64_t current_timestamp){
     int error_code = 0;
     uint16_t full_instruction;
 
+    /*update the state*/
+    CPU_update_state(cpu, current_timestamp);
+
     /*fetch*/
     error_code = CPU_fetch(cpu, &full_instruction);
     if(error_code){
@@ -294,6 +297,7 @@ int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction, uint1
         y = (full_instruction & 0x00F0) >> 4;
 
         cpu->Vx[x] = cpu->Vx[x] | cpu->Vx[y];
+        cpu->Vx[0xF] = 0; // for chip-8 quirks
         break;
 
     case AND_VV: // 8xy2
@@ -301,6 +305,7 @@ int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction, uint1
         y = (full_instruction & 0x00F0) >> 4;
 
         cpu->Vx[x] = cpu->Vx[x] & cpu->Vx[y];
+        cpu->Vx[0xF] = 0; // for chip-8 quirks
         break;
 
     case XOR_VV: // 8xy3
@@ -308,6 +313,7 @@ int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction, uint1
         y = (full_instruction & 0x00F0) >> 4;
 
         cpu->Vx[x] = cpu->Vx[x] ^ cpu->Vx[y];
+        cpu->Vx[0xF] = 0; // for chip-8 quirks
         break;
 
     case ADD_VV: // 8xy4
@@ -338,12 +344,13 @@ int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction, uint1
 
     case SHR: // 8xy6
         x = (full_instruction & 0x0F00) >> 8;
+        y = (full_instruction & 0x00F0) >> 4;
 
         /*we calculate if there is a carry*/
-        tmp = cpu->Vx[x] & 1;
+        tmp = cpu->Vx[y] & 1;
 
         /*we divide by 2*/
-        cpu->Vx[x] = cpu->Vx[x] >> 1;
+        cpu->Vx[x] = cpu->Vx[y] >> 1;
 
         /*we set the carry*/
         cpu->Vx[0xF] = tmp;
@@ -363,12 +370,13 @@ int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction, uint1
 
     case SHL: // 8xyE
         x = (full_instruction & 0x0F00) >> 8;
+        y = (full_instruction & 0x00F0) >> 4;
         
         /*we calculate if there is a carry*/
-        tmp = (cpu->Vx[x] & 0b10000000) >> 7;
+        tmp = (cpu->Vx[y] & 0b10000000) >> 7;
 
         /*we multiply by 2*/
-        cpu->Vx[x] = cpu->Vx[x] << 1;
+        cpu->Vx[x] = cpu->Vx[y] << 1;
 
         /*we set the carry*/
         cpu->Vx[0xF] = tmp;
@@ -520,6 +528,8 @@ int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction, uint1
             error_code = RAM_set_value(cpu->ram_ptr, cpu->I + i, cpu->Vx[i]);
             if(error_code) return 2;
         }
+
+        cpu->I += x +1; // for chip-8 quirks
         break;
 
     case LD_VI: // Fx65
@@ -531,6 +541,7 @@ int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction, uint1
 
             cpu->Vx[i] = ram_value;
         }
+        cpu->I += x +1; // for chip-8 quirks
         break;
 
     default:

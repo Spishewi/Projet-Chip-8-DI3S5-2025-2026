@@ -107,7 +107,7 @@ uint8_t hexadecimal_char_sprites[16][5] = {
             0b10000000,
             0b10000000}
 };
-
+*/
 /*set all the RAM to 0*/
 int RAM_clear(struct RAM* ram);
 
