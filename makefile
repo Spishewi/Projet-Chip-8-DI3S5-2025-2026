@@ -8,7 +8,7 @@ ifeq ($(OS),Windows_NT)
     EXE_EXT := .exe
     RM_DIR  := rmdir /S /Q
     MKDIR_P = if not exist "$(1)" mkdir "$(1)"
-	LDFLAGS := -Llib/mingw64/ -lprovided -lSDL2 -lm
+	LDFLAGS := -Llib/mingw64/ -lprovided -lmingw32 -lSDL2main -lSDL2 -lm
 else
     OS_NAME := $(shell uname -s)
     EXE_EXT :=
@@ -26,6 +26,8 @@ BIN_DIR := bin
 CFLAGS  := -Wall -DDEBUG -I include/
 
 EXECUTABLE := $(BIN_DIR)/executable$(EXE_EXT)
+DEFAULT_ROM := ./roms/1-chip8-logo.ch8
+ROM := DEFAULT_ROM
 
 # recursive wildcard function
 rwildcard = $(wildcard $1$2) $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2))
@@ -63,4 +65,4 @@ clean:
 	$(RM_DIR) "$(OBJ_DIR)"
 
 run: build
-	$(EXECUTABLE)
+	$(EXECUTABLE) $(ROM)
