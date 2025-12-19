@@ -114,7 +114,7 @@ int main(int argc, char** argv){
         }
 
         /*wait reduce the speed of the emulator and have a playable game*/
-        SDL_Delay(2);
+        SDL_Delay(1);
     }
 
     /*free all the memory*/
