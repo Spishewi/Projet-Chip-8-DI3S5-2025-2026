@@ -5,6 +5,104 @@
 #include <misc/debug.h>
 #include <system/ram.h>
 
+const uint8_t hexadecimal_char_sprites[16][5] = {
+    [0x0] ={0b11110000,
+            0b10010000,
+            0b10010000,
+            0b10010000,
+            0b11110000},
+
+    [0x1] ={0b00100000,
+            0b01100000,
+            0b00100000,
+            0b00100000,
+            0b01110000},
+
+    [0x2] ={0b11110000,
+            0b00010000,
+            0b11110000,
+            0b10000000,
+            0b11110000},
+
+    [0x3] ={0b11110000,
+            0b00010000,
+            0b11110000,
+            0b00010000,
+            0b11110000},
+
+    [0x4] ={0b10010000,
+            0b10010000,
+            0b11110000,
+            0b00010000,
+            0b00010000},
+
+    [0x5] ={0b11110000,
+            0b10000000,
+            0b11110000,
+            0b00010000,
+            0b11110000},
+
+    [0x6] ={0b11110000,
+            0b10000000,
+            0b11110000,
+            0b10010000,
+            0b11110000},
+
+    [0x7] ={0b11110000,
+            0b00010000,
+            0b00100000,
+            0b01000000,
+            0b01000000},
+
+    [0x8] ={0b11110000,
+            0b10010000,
+            0b11110000,
+            0b10010000,
+            0b11110000},
+
+    [0x9] ={0b11110000,
+            0b10010000,
+            0b11110000,
+            0b00010000,
+            0b11110000},
+
+    [0xA] ={0b11110000,
+            0b10010000,
+            0b11110000,
+            0b10010000,
+            0b10010000},
+
+    [0xB] ={0b11100000,
+            0b10010000,
+            0b11100000,
+            0b10010000,
+            0b11100000},
+
+    [0xC] ={0b11110000,
+            0b10000000,
+            0b10000000,
+            0b10000000,
+            0b11110000},
+
+    [0xD] ={0b11100000,
+            0b10010000,
+            0b10010000,
+            0b10010000,
+            0b11100000},
+
+    [0xE] ={0b11110000,
+            0b10000000,
+            0b11110000,
+            0b10000000,
+            0b11110000},
+
+    [0xF] ={0b11110000,
+            0b10000000,
+            0b11110000,
+            0b10000000,
+            0b10000000}
+};
+
 /*set all the RAM to 0*/
 int RAM_clear(struct RAM* ram){
     int error_code = 0;
@@ -38,18 +136,6 @@ int RAM_get_value(struct RAM* ram, uint16_t address, uint8_t* value){
 
     /*store the value in the storage variable*/
     *value = ram->ram_array[address];
-    return 0;
-}
-
-/*set the characters sprites in the RAM from 0x000 to 0x1FF*/
-int RAM_init_char_sprites(struct RAM* ram, uint16_t start_address){
-    ram->ram_array[start_address] = hexadecimal_char_sprites[16][5];
-    return 0;
-}
-
-/*get the characters sprites from the RAM*/
-int RAM_get_hex_char(struct RAM* ram, uint16_t start_address, uint8_t character){
-    character = hexadecimal_char_sprites[character];
     return 0;
 }
 
@@ -104,4 +190,28 @@ int RAM_print_instructions(struct RAM* ram, uint16_t start_address, uint16_t n){
     }
 
     return  0;
+}
+
+/*initialize the char sprites in the RAM*/
+int RAM_init_char_sprites(struct RAM* ram, uint16_t start_address){
+    int error_code = 0;
+
+    for(unsigned int i = 0; i < 16; i++){
+        for(unsigned int j = 0; j < 5; j++){
+            error_code = RAM_set_value(ram, start_address + i * 5 + j, hexadecimal_char_sprites[i][j]);
+            if(error_code) return 1;
+        }
+    }
+    return 0;
+}
+
+/*get the characters sprites from the RAM*/
+int RAM_get_hex_char_address(uint16_t start_address, uint8_t character, uint16_t* return_address){
+    if(character >= 16){
+        printf("[ERROR] : character out of range.\n");
+        return 1;
+    }
+    
+    *return_address = start_address + character * 5;
+    return 0;
 }

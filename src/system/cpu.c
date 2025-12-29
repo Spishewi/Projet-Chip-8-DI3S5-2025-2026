@@ -505,7 +505,7 @@ int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction, uint1
     case LD_FV: // Fx29
         x = (full_instruction & 0x0F00) >> 8;
 
-        cpu->I = RAM_get_hex_char(cpu->ram_ptr, 0x000, x);
+        RAM_get_hex_char_address(0x0, x, &(cpu->I));
         break;
 
     case LD_BV: // Fx33
@@ -553,17 +553,9 @@ int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction, uint1
 void CPU_update_state(struct CPU* cpu, uint64_t current_timestamp){
     /*update timers*/
     uint64_t elapsed_time_since_last_state_update = current_timestamp - cpu->last_state_update;
-    unsigned int lagspike_detected = 0;
 
     /*do the calculation with double, and then go back to unsigned integers*/
     uint64_t nb_of_updates_to_do = (uint64_t)((double)elapsed_time_since_last_state_update * (double)CPU_TIMER_HZ / (double)1000);
-
-    /*reduce the number of updates to limit lag spikes (prefere )*/
-    if(nb_of_updates_to_do > CPU_UPDATE_LIMIT){
-        nb_of_updates_to_do = CPU_UPDATE_LIMIT;
-        lagspike_detected = 1;
-    }
-
 
     if(nb_of_updates_to_do < cpu->DT) cpu->DT -= nb_of_updates_to_do;
     else cpu->DT = 0;
@@ -575,8 +567,7 @@ void CPU_update_state(struct CPU* cpu, uint64_t current_timestamp){
     uint64_t elapsed_time_on_timers = (uint64_t)((double)nb_of_updates_to_do * (double)1000 / (double)CPU_TIMER_HZ);
 
     /*add elapsed_time_on_timers instead of current_timestamp to let it catch up when a in-between update is finished*/
-    if(!lagspike_detected) cpu->last_state_update += elapsed_time_on_timers;
-    else cpu->last_state_update = current_timestamp; // warp in time to catch up
+    cpu->last_state_update += elapsed_time_on_timers;
 
     /*update speaker*/
     if(cpu->ST) Speaker_on(cpu->speaker_ptr);
