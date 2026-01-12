@@ -522,7 +522,7 @@ int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction, uint1
     case LD_FV: // Fx29
         x = (full_instruction & 0x0F00) >> 8;
 
-        RAM_get_hex_char_address(0x0, x, &(cpu->I));
+        RAM_get_hex_char_address(0x0, cpu->Vx[x], &(cpu->I));
         break;
 
     case LD_BV: // Fx33
