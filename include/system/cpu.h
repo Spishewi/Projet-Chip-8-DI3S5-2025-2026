@@ -12,7 +12,6 @@
 #define CPU_VX_NUMBER 16
 #define CPU_STACK_SIZE 16
 #define CPU_TIMER_HZ 60
-#define CPU_UPDATE_LIMIT 30 // max number of updates that can be done in one update state call. Used to flatten lag-spikes
 
 /*structure representing a CPU. Needs to be initialized with the`CPU_init` function, and destroyed with the `CPU_destroy` function*/
 struct CPU {

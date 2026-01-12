@@ -79,22 +79,25 @@ int main(int argc, char** argv){
     /*main loop (run the fetch-decode-execute cycle)*/
     bool running = true;
     bool pause = false;
+    int error_code = 0;
     while (running)
-    {
-        /*process events to have a reponding window and a working close button*/
-        SDL_Event event;
-        while(SDL_PollEvent(&event)){
-            switch (event.type)
-            {
-            case SDL_QUIT:
+    {   
+        // used to do nothing when we are in pause
+        // we still do keyboard get to prevent having errors when we are not checking events for too long
+        if(pause){
+            error_code = Keyboard_get(&keyboard, 0, NULL);
+            if(error_code == QUIT){
                 running = false;
-                break;
             }
+            else if(error_code){
+                fprintf(stderr, "[ERROR] : Keyboard get error.\n");
+                running = false;
+            }
+            
+            continue;
         }
-
-        if(pause) continue;
-
-        /*debug*/
+        
+        /*debug to print the instruction that will be executed*/
         /*
         if(RAM_print_instructions(&ram, cpu.PC, 1)){
             fprintf(stderr, "[ERROR] : RAM print instructions error.\n");
@@ -102,10 +105,14 @@ int main(int argc, char** argv){
         }*/
 
         /*run one FDE cycle*/
-        if(CPU_FDE(&cpu, SDL_GetTicks64())){
+        error_code = CPU_FDE(&cpu, SDL_GetTicks64());
+        if(error_code == -1){
+            running = false;
+        }else if(error_code){
             fprintf(stderr, "[ERROR] : CPU FDE error.\n");
             pause = true;
         }
+        
 
         /*update the screen*/
         if(Display_update(&display)){
@@ -114,7 +121,7 @@ int main(int argc, char** argv){
         }
 
         /*wait reduce the speed of the emulator and have a playable game*/
-        SDL_Delay(2);
+        SDL_Delay(1);
     }
 
     /*free all the memory*/
