@@ -42,11 +42,11 @@ ou mettre le chemin de la rom en argument de l'executable généré avec "make b
 ## Structure du code
 
 Toutes les fonctions ont été réparties dans 3 fichiers :
-- cpu.c comprend l'initialisation du CPU, le fetch-decode-execute ainsi que les 35 instructions, et les timers ;
-- ram.c comprend les sprites des caractères et toutes les fonctions pour interagir avec la RAM ;
-- rom.c comprend la fonction pour charger une ROM dans la RAM ;
+- `cpu.c` comprend l'initialisation du CPU, le fetch-decode-execute ainsi que les 35 instructions, et les timers ;
+- `ram.c` comprend les sprites des caractères et toutes les fonctions pour interagir avec la RAM ;
+- `rom.c` comprend la fonction pour charger une ROM dans la RAM ;
 Nous avons également 3 fichiers d'entêtes cpu.h, ram.h et rom.h qui comprennent les déclarations de fonctions et les structures de la RAM et du CPU.
-Pour finir, il y a un fichier main.c, et un makefile qui fonctionne avec les 2 OS Windows et Linux.
+Pour finir, il y a un fichier `main.c`, et un `makefile` qui fonctionne avec les 2 OS Windows et Linux.
 
 ## Réalisation des consignes
 

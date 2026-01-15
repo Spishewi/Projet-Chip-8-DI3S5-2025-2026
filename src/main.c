@@ -36,7 +36,7 @@ int main(int argc, char** argv){
 
     /*get the rom file path from the arguments*/
     char* rom_file_path = argv[1];
-    printf("Running ROM : \"%s\".", rom_file_path);
+    printf("Running ROM : \"%s\".\n", rom_file_path);
 
     /*create the RAM*/
     struct RAM ram;
@@ -95,30 +95,34 @@ int main(int argc, char** argv){
         return 1;
     }
 
+    printf("CPU initialised.\n");
+
     /*main loop (run the fetch-decode-execute cycle)*/
     bool running = true;
     bool pause = false;
     int error_code = 0;
+    int dummy_key_value; // used to give a place for Keyboard_get to write its return value (we never check it)
     while (running)
     {   
-        // used to do nothing when we are in pause
-        // we still do keyboard get to prevent having errors when we are not checking events for too long
-        if(pause){
-            error_code = Keyboard_get(&keyboard, 0, NULL);
-            if(error_code == QUIT){
-                running = false;
+        // we do keyboard get to prevent having errors when we are not checking events for too long
+        // eg: when we are in pause or when looping with 1nnn
+        error_code = Keyboard_get(&keyboard, 0, &dummy_key_value);
+        if(error_code == QUIT){
+            running = false;
+            continue;
             }
-            else if(error_code){
-                fprintf(stderr, "[ERROR] : Keyboard get error.\n");
-                running = false;
-            }
-            
+        else if(error_code){
+            fprintf(stderr, "[ERROR] : Keyboard get error.\n");
+            running = false;
             continue;
         }
+
+        // used to do nothing when we are in pause
+        // we also can wrap instruction bellow and remove the continue instruction, but it seams heavier
+        if(pause) continue;
         
         /*debug to print the instruction that will be executed*/
-        /*
-        if(RAM_print_instructions(&ram, cpu.PC, 1)){
+        /*if(RAM_print_instructions(&ram, cpu.PC, 1)){
             fprintf(stderr, "[ERROR] : RAM print instructions error.\n");
             pause = true;
         }*/

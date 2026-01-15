@@ -472,6 +472,11 @@ int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction, uint1
 
         error_code = Keyboard_get(cpu->keyboard_ptr, cpu->Vx[x], &key_id);
         if(error_code){
+            // if errcode is QUIT, we need to close the emulator.
+            // We use the special code -1 to detect it back in the main loop
+            if(errcode == QUIT) return -1;
+
+            // if the errcode isn't QUIT, do as usual
             fprintf(stderr, "[ERROR] : Keyboard get error.\n");
             return 2;
         }
