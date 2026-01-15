@@ -2,7 +2,42 @@
 
 ## Description
 
+L'objectif de ce projet était d'écrire un émulateur CHIP 8 permettant à n’importe quel fichier CHIP 8 ROM d’être lu et exécuté.
 
+## Lancement
+
+Pour démarrer l'émulateur, il faut utiliser le makefile. Le plus simple est d'utiliser une des 3 commandes :
+
+make build (crée les executables)
+make clean (supprime les fichiers objets temporaires)
+make run (build + lance l'executable)
+
+pour lancer une ROM en particulier, la manière la plus simple est de faire :
+make run ROM="la/rom.ch8"
+ou mettre le chemin de la rom en argument de l'executable généré avec "make build"
+
+## Architecture de fichiers
+
+- `include/`
+  - `display/`
+  - `keyboard/`
+  - `misc/`
+  - `speaker/`
+  - `system/`
+    - `cpu.h`
+    - `ram.h`
+    - `rom.h`
+- `lib/`
+- `roms/`
+- `src/`
+  - `system/`
+    - `cpu.c`
+    - `ram.c`
+    - `rom.c`
+  - `main.c`
+- `LICENSE`
+- `makefile`
+- `README.md` <-- vous-êtes ici
 
 ## Structure du code
 
@@ -25,12 +60,18 @@ Les 35 instructions ont été implémentées et fonctionnent. La totalité des R
 - ROM 7 beep : fonctionne avec le test et manuellement ;
 - Plusieurs jeux ont été testés notamment : Pong, Tetris et Tron. Les jeux fonctionnent comme ils devraient et l'affichage des scores est opérationnel.
 
-## comment faire fonctionner le projet
+## Auteurs
+Aurèle AUMONT--VESNIER et Ethan NOMBELLA
 
-### TODO
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+## Remerciements
+Nous voulions remercier M. BOCQUILLON Ronan et M. MONMARCHE Nicolas de nous avoir accompagnés dans ce projet.
 
 ## License
-For open source projects, say how it is licensed.
+
+Copyright (C) 2026 Aurèle AUMONT--VESNIER et Ethan NOMBELLA.
+
+chip-8-s5 est un logiciel libre ; vous pouvez le redistribuer et/ou le modifier sous les termes de la GNU General Public License telle que publiée par la Free Software Foundation ; soit la version 3 de la Licence, ou (à votre choix) toute version ultérieure.
+
+chip-8-s5 est distribué dans l’espoir qu’il sera utile, mais SANS AUCUNE GARANTIE ; sans même la garantie implicite de COMMERCIABILITÉ ou APTITUDE À UN USAGE PARTICULIER. Voir la GNU General Public License pour plus de détails.
+
+Vous devriez avoir reçu une copie de la GNU General Public License avec ce programme. Sinon, consultez <http://.gnu.org/licenses/>
