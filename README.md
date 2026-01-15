@@ -6,15 +6,15 @@ L'objectif de ce projet était d'écrire un émulateur CHIP 8 permettant à n’
 
 ## Lancement
 
-Pour démarrer l'émulateur, il faut utiliser le makefile. Le plus simple est d'utiliser une des 3 commandes :
+Pour démarrer l'émulateur, il faut utiliser le `makefile`. Le plus simple est d'utiliser une des 3 commandes :
 
-make build (crée les executables)
-make clean (supprime les fichiers objets temporaires)
-make run (build + lance l'executable)
+- `make build` (crée les executables)
+- `make clean` (supprime les fichiers objets temporaires)
+- `make run` (build + lance l'executable)
 
 pour lancer une ROM en particulier, la manière la plus simple est de faire :
-make run ROM="la/rom.ch8"
-ou mettre le chemin de la rom en argument de l'executable généré avec "make build"
+`make run ROM="la/rom.ch8"`
+ou mettre le chemin de la rom en argument de l'executable généré avec `make build`
 
 ## Architecture de fichiers
 
@@ -41,12 +41,14 @@ ou mettre le chemin de la rom en argument de l'executable généré avec "make b
 
 ## Structure du code
 
-Toutes les fonctions ont été réparties dans 3 fichiers :
+Toutes les fonctions ont été réparties dans 3 fichiers sources principaux :
 - `cpu.c` comprend l'initialisation du CPU, le fetch-decode-execute ainsi que les 35 instructions, et les timers ;
 - `ram.c` comprend les sprites des caractères et toutes les fonctions pour interagir avec la RAM ;
-- `rom.c` comprend la fonction pour charger une ROM dans la RAM ;
-Nous avons également 3 fichiers d'entêtes cpu.h, ram.h et rom.h qui comprennent les déclarations de fonctions et les structures de la RAM et du CPU.
-Pour finir, il y a un fichier `main.c`, et un `makefile` qui fonctionne avec les 2 OS Windows et Linux.
+- `rom.c` comprend la fonction pour charger une ROM dans la RAM
+
+Nous avons également 3 fichiers d'entêtes `cpu.h`, `ram.h` et `rom.h` qui comprennent respectivement les déclarations des types et prototypes du CPU, de la RAM, et du chargement de la ROM.
+
+Pour finir, il y a un fichier `main.c` permettant de relier tout les modules, et un `makefile` qui fonctionne avec **Windows** et **Linux**.
 
 ## Réalisation des consignes
 
@@ -55,16 +57,16 @@ Les 35 instructions ont été implémentées et fonctionnent. La totalité des R
 - ROM 2 IBM logo : fonctionne ;
 - ROM 3 corax+ + : tous les tests sont validés ;
 - ROM 4 flags : tous les tests sont validés ;
-- ROM 5 quirks : 1 CHIP-8 se lance comme prévu et est validé ;
+- ROM 5 quirks : "1. CHIP-8" se lance comme prévu et est validé ;
 - ROM 6 keypad : toutes les touches prévues sont détectées, les 3 tests sont validés. Cependant, la réactivité des touches est lente ;
 - ROM 7 beep : fonctionne avec le test et manuellement ;
 - Plusieurs jeux ont été testés notamment : Pong, Tetris et Tron. Les jeux fonctionnent comme ils devraient et l'affichage des scores est opérationnel.
 
 ## Auteurs
-Aurèle AUMONT--VESNIER et Ethan NOMBELLA
+**Aurèle AUMONT--VESNIER** et **Ethan NOMBELLA**
 
 ## Remerciements
-Nous voulions remercier M. BOCQUILLON Ronan et M. MONMARCHE Nicolas de nous avoir accompagnés dans ce projet.
+Nous voulions remercier **M. BOCQUILLON Ronan** et **M. MONMARCHE Nicolas** de nous avoir accompagnés dans ce projet.
 
 ## License
 
