@@ -6,7 +6,7 @@
 
 # pour lancer une ROM en particulier, la manière la plus simple est de faire :
 # make run ROM="la/rom.ch8"
-# ou le mettre le chemin de la rom en argument de l'executable généré avec "make build"
+# ou mettre le chemin de la rom en argument de l'executable généré avec "make build"
 
 
 # definitions des différentes commandes que l'ont peux faire

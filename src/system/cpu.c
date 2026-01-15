@@ -1,3 +1,22 @@
+/*-------------------------------------------------------------------------*
+ | Copyright (C) 2026 Aurèle AUMONT--VESNIER and Ethan NOMBELLA.           |
+ |                                                                         |
+ | This file is part of chip-8-s5, yet another CHIP 8 emulator.            |
+ |                                                                         |
+ | chip-8-s5 is free software; you can redistribute it and/or modify       |
+ | it under the terms of the GNU General Public License as published by    |
+ | the Free Software Foundation; either version 3 of the License,          |
+ | or (at your option) any later version.                                  |
+ |                                                                         |
+ | chip-8-s5 is distributed in the hope that it will be useful,            |
+ | but WITHOUT ANY WARRANTY; without even the implied warranty of          |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the            |
+ | GNU General Public License for more details.                            |
+ |                                                                         |
+ | You should have received a copy of the GNU General Public License       |
+ | along with this program. If not, see <http://www.gnu.org/licenses/>.    |
+ *-------------------------------------------------------------------------*/
+
 #include <stdint.h>
 #include <stdlib.h>
 #include <time.h>
@@ -453,6 +472,11 @@ int CPU_execute(struct CPU* cpu, enum CPU_Instruction decoded_instruction, uint1
 
         error_code = Keyboard_get(cpu->keyboard_ptr, cpu->Vx[x], &key_id);
         if(error_code){
+            // if errcode is QUIT, we need to close the emulator.
+            // We use the special code -1 to detect it back in the main loop
+            if(errcode == QUIT) return -1;
+
+            // if the errcode isn't QUIT, do as usual
             fprintf(stderr, "[ERROR] : Keyboard get error.\n");
             return 2;
         }
