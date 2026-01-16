@@ -60,6 +60,7 @@ Les 35 instructions ont été implémentées et fonctionnent. La totalité des R
 - ROM 5 quirks : "1. CHIP-8" se lance comme prévu et est validé ;
 - ROM 6 keypad : toutes les touches prévues sont détectées, les 3 tests sont validés. Cependant, la réactivité des touches est lente ;
 - ROM 7 beep : fonctionne avec le test et manuellement ;
+- BONUS :  le programme se quitte proprement lorsqu'on appuie sur la croix en haut à droite de la fenêtre ;
 - Plusieurs jeux ont été testés notamment : Pong, Tetris et Tron. Les jeux fonctionnent comme ils devraient et l'affichage des scores est opérationnel.
 
 ## Auteurs
