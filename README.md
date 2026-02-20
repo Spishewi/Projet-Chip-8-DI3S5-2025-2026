@@ -12,9 +12,9 @@ Pour démarrer l'émulateur, il faut utiliser le `makefile`. Le plus simple est 
 - `make clean` (supprime les fichiers objets temporaires)
 - `make run` (build + lance l'executable)
 
-pour lancer une ROM en particulier, la manière la plus simple est de faire :
+Pour lancer une ROM en particulier, la manière la plus simple est de faire :
 `make run ROM="la/rom.ch8"`
-ou mettre le chemin de la rom en argument de l'executable généré avec `make build`
+ou mettre le chemin de la ROM en argument de l'executable généré avec `make build`
 
 ## Architecture de fichiers
 
@@ -55,7 +55,7 @@ Pour finir, il y a un fichier `main.c` permettant de relier tout les modules, et
 Les 35 instructions ont été implémentées et fonctionnent. La totalité des ROMs de tests sont opérationnelles et validées :
 - ROM 1 CHIP8 logo : fonctionne ;
 - ROM 2 IBM logo : fonctionne ;
-- ROM 3 corax+ + : tous les tests sont validés ;
+- ROM 3 corax+ : tous les tests sont validés ;
 - ROM 4 flags : tous les tests sont validés ;
 - ROM 5 quirks : "1. CHIP-8" se lance comme prévu et est validé ;
 - ROM 6 keypad : toutes les touches prévues sont détectées, les 3 tests sont validés. Cependant, la réactivité des touches est lente ;
@@ -67,7 +67,7 @@ Les 35 instructions ont été implémentées et fonctionnent. La totalité des R
 **Aurèle AUMONT--VESNIER** et **Ethan NOMBELLA**
 
 ## Remerciements
-Nous voulions remercier **M. BOCQUILLON Ronan** et **M. MONMARCHE Nicolas** de nous avoir accompagnés dans ce projet.
+Nous tenons à remercier **M. BOCQUILLON Ronan** et **M. MONMARCHE Nicolas** de nous avoir accompagnés dans ce projet.
 
 ## License
 
@@ -77,4 +77,4 @@ chip-8-s5 est un logiciel libre ; vous pouvez le redistribuer et/ou le modifier 
 
 chip-8-s5 est distribué dans l’espoir qu’il sera utile, mais SANS AUCUNE GARANTIE ; sans même la garantie implicite de COMMERCIABILITÉ ou APTITUDE À UN USAGE PARTICULIER. Voir la GNU General Public License pour plus de détails.
 
-Vous devriez avoir reçu une copie de la GNU General Public License avec ce programme. Sinon, consultez <http://.gnu.org/licenses/>
+Vous devriez avoir reçu une copie de la GNU General Public License avec ce programme. Sinon, consultez <http://gnu.org/licenses/>
